@@ -1,0 +1,105 @@
+import { type NextRequest, NextResponse } from "next/server";
+import { createWalletClient, http, type Address } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { polygon, polygonAmoy } from "viem/chains";
+import { NFT_ABI } from "@/contracts/nft-abi";
+import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
+
+// Helper function to get client IP
+function getClientIp(request: NextRequest): string {
+  const forwarded = request.headers.get("x-forwarded-for");
+  const realIp = request.headers.get("x-real-ip");
+
+  if (forwarded) {
+    return forwarded.split(",")[0].trim();
+  }
+
+  if (realIp) {
+    return realIp;
+  }
+
+  return "unknown";
+}
+
+// Check if IP is allowed for sponsored minting
+function isIpAllowed(ip: string): boolean {
+  const allowedIps = process.env.ALLOWED_IPS?.split(",").map((i) => i.trim()) || [];
+  return allowedIps.includes(ip);
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { to, tokenType } = body;
+
+    if (!to || tokenType === undefined) {
+      return NextResponse.json(
+        { success: false, error: "Missing required parameters" },
+        { status: 400 }
+      );
+    }
+
+    // Check IP address
+    const clientIp = getClientIp(request);
+
+    if (!isIpAllowed(clientIp)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "IP not allowed for sponsored minting",
+          clientIp,
+        },
+        { status: 403 }
+      );
+    }
+
+    // Get sponsor wallet private key
+    const privateKey = process.env.SPONSOR_WALLET_PRIVATE_KEY;
+
+    if (!privateKey) {
+      console.error("SPONSOR_WALLET_PRIVATE_KEY not set");
+      return NextResponse.json(
+        { success: false, error: "Server configuration error" },
+        { status: 500 }
+      );
+    }
+
+    // Determine network (default to Polygon mainnet)
+    const useTestnet = process.env.USE_TESTNET === "true";
+    const chain = useTestnet ? polygonAmoy : polygon;
+    const contractAddress = useTestnet
+      ? CONTRACT_ADDRESSES.polygonAmoy
+      : CONTRACT_ADDRESSES.polygon;
+
+    // Create wallet client
+    const account = privateKeyToAccount(privateKey as `0x${string}`);
+    const client = createWalletClient({
+      account,
+      chain,
+      transport: http(),
+    });
+
+    // Execute mint transaction
+    const hash = await client.writeContract({
+      address: contractAddress,
+      abi: NFT_ABI,
+      functionName: "mint",
+      args: [to as Address, BigInt(tokenType)],
+    });
+
+    return NextResponse.json({
+      success: true,
+      txHash: hash,
+      message: "Minted successfully with sponsored gas",
+    });
+  } catch (error) {
+    console.error("Sponsored mint error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  }
+}
