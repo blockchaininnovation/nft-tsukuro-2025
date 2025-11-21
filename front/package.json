@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "anvil:start": "cd ../contract && anvil",
+    "anvil:deploy": "cd ../contract && forge script script/SoulboundToken.s.sol:DeploySoulboundToken --rpc-url http://localhost:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast",
+    "anvil:deploy-update": "../scripts/deploy-to-anvil.sh",
+    "dev:anvil": "echo 'Start Anvil in a separate terminal with: npm run anvil:start' && npm run dev"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.10",

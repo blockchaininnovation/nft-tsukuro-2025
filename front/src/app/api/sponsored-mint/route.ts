@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createWalletClient, http, type Address } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { polygon, polygonAmoy } from "viem/chains";
+import { polygon, polygonAmoy, foundry } from "viem/chains";
 import { NFT_ABI } from "@/contracts/nft-abi";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 
@@ -64,19 +64,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Determine network (default to Polygon mainnet)
+    // Determine network (default to Anvil for local development)
     const useTestnet = process.env.USE_TESTNET === "true";
-    const chain = useTestnet ? polygonAmoy : polygon;
-    const contractAddress = useTestnet
-      ? CONTRACT_ADDRESSES.polygonAmoy
-      : CONTRACT_ADDRESSES.polygon;
+    const useAnvil = process.env.USE_ANVIL !== "false"; // Default to Anvil
+    const chain = useAnvil ? foundry : (useTestnet ? polygonAmoy : polygon);
+    const contractAddress = useAnvil
+      ? CONTRACT_ADDRESSES.anvil
+      : (useTestnet ? CONTRACT_ADDRESSES.polygonAmoy : CONTRACT_ADDRESSES.polygon);
 
     // Create wallet client
     const account = privateKeyToAccount(privateKey as `0x${string}`);
+    const rpcUrl = useAnvil ? process.env.NEXT_PUBLIC_ANVIL_RPC_URL : undefined;
     const client = createWalletClient({
       account,
       chain,
-      transport: http(),
+      transport: http(rpcUrl),
     });
 
     // Execute mint transaction

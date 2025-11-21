@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { NFT_ABI } from "@/contracts/nft-abi";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
-import { polygon } from "wagmi/chains";
+import { anvil, polygon, polygonAmoy } from "wagmi/chains";
 
 interface NFTCardProps {
   id: number;
@@ -25,9 +25,22 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
     hash,
   });
 
-  const contractAddress = chain?.id === polygon.id
-    ? CONTRACT_ADDRESSES.polygon
-    : CONTRACT_ADDRESSES.polygonAmoy;
+  // Select contract address based on current network
+  const getContractAddress = () => {
+    if (!chain) return CONTRACT_ADDRESSES.anvil; // Default to Anvil
+
+    switch (chain.id) {
+      case polygon.id:
+        return CONTRACT_ADDRESSES.polygon;
+      case polygonAmoy.id:
+        return CONTRACT_ADDRESSES.polygonAmoy;
+      case anvil.id:
+      default:
+        return CONTRACT_ADDRESSES.anvil;
+    }
+  };
+
+  const contractAddress = getContractAddress();
 
   const handleMint = async () => {
     if (!isConnected || !address) {

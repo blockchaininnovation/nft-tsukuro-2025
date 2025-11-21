@@ -4,6 +4,8 @@ export const CONTRACT_ADDRESSES = {
     "0x0000000000000000000000000000000000000000") as `0x${string}`,
   polygonAmoy: (process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS_TESTNET ||
     "0x0000000000000000000000000000000000000000") as `0x${string}`,
+  anvil: (process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS ||
+    "0x5FbDB2315678afecb367f032d93F642f64180aa3") as `0x${string}`,
 } as const;
 
 // NFT Types
