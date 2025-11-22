@@ -41,8 +41,10 @@ export async function POST(request: NextRequest) {
 
     // Check IP address
     const clientIp = getClientIp(request);
+    const venueSession = request.cookies.get("venue_session");
+    const isVenueMode = venueSession?.value === "true";
 
-    if (!isIpAllowed(clientIp)) {
+    if (!isVenueMode && !isIpAllowed(clientIp)) {
       return NextResponse.json(
         {
           success: false,

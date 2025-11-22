@@ -121,7 +121,17 @@ front/
 
 ### 2. ABIの更新
 
-デプロイしたコントラクトのABIを[src/contracts/nft-abi.ts](src/contracts/nft-abi.ts)に反映します。
+`contract`ディレクトリで`forge build`を実行してABIを生成します。
+生成された`contract/out/<ContractName>.sol/<ContractName>.json`を`src/contracts/abi`ディレクトリにコピーし、
+[src/contracts/nft-abi.ts](src/contracts/nft-abi.ts)の`NFT_ABI`定数に反映します。
+
+```typescript
+import { abi } from "./abi/<ContractName>.json"
+
+// NFT Contract ABI
+// TODO: Replace this with actual ABI after contract deployment
+export const NFT_ABI = abi
+```
 
 ### 3. コントラクトアドレスの設定
 
@@ -140,20 +150,7 @@ front/
 `public/nft-1.svg`〜`nft-4.svg`を実際のNFT画像（1024×1024px推奨）に差し替えます。
 
 ## 本番デプロイ
-
-### Vercelへのデプロイ
-
-```bash
-# Vercel CLIのインストール
-pnpm add -g vercel
-
-# デプロイ
-vercel
-```
-
-環境変数は、Vercelのダッシュボードで設定してください。
-
-**重要**: `SPONSOR_WALLET_PRIVATE_KEY`は必ずVercelの環境変数で設定し、コードにハードコードしないでください。
+**重要**: `SPONSOR_WALLET_PRIVATE_KEY`は必ず環境変数で設定し、コードにハードコードしないでください。
 
 ## セキュリティ上の注意
 
@@ -166,7 +163,6 @@ vercel
 
 ### ウォレット接続できない
 
-- WalletConnect Project IDが正しく設定されているか確認
 - Metamaskが正しくインストールされているか確認
 
 ### ミントに失敗する
@@ -180,7 +176,3 @@ vercel
 - `SPONSOR_WALLET_PRIVATE_KEY`が正しく設定されているか確認
 - IPアドレスが`ALLOWED_IPS`に含まれているか確認
 - スポンサーウォレットにMATICが十分にあるか確認
-
-## ライセンス
-
-MIT

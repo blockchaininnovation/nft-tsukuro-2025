@@ -1,16 +1,22 @@
 import { Header } from "@/components/header";
 import { NFTCard } from "@/components/nft-card";
 import { NFT_METADATA } from "@/contracts/addresses";
+import { cookies } from "next/headers";
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies();
+  const isVenueMode = cookieStore.get("venue_session")?.value === "true";
+
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      <Header />
+      <Header isVenueMode={isVenueMode} />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold mb-2">NFTギャラリー</h2>
           <p className="text-gray-600 dark:text-gray-400">
-            お好きな作品を選んでミントしてください
+            {isVenueMode
+              ? "会場モード：アドレスを入力してミントしてください"
+              : "お好きな作品を選んでミントしてください"}
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -21,6 +27,7 @@ export default function Home() {
               title={nft.title}
               description={nft.description}
               image={nft.image}
+              isVenueMode={isVenueMode}
             />
           ))}
         </div>
