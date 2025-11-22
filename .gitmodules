@@ -1,0 +1,6 @@
+[submodule "contract/lib/ERC5192"]
+	path = contract/lib/ERC5192
+	url = https://github.com/attestate/ERC5192
+[submodule "contract/lib/openzeppelin-contracts"]
+	path = contract/lib/openzeppelin-contracts
+	url = https://github.com/Openzeppelin/openzeppelin-contracts
