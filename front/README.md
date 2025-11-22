@@ -137,15 +137,11 @@ export const NFT_ABI = abi
 
 `.env.local`に実際のコントラクトアドレスを設定します。
 
-### 4. WalletConnect Project IDの取得
-
-[WalletConnect Cloud](https://cloud.walletconnect.com/)でプロジェクトを作成し、Project IDを取得します。
-
-### 5. スポンサーウォレットの準備
+### 4. スポンサーウォレットの準備
 
 ガス代を負担するウォレットを作成し、十分なMATICを入金します。
 
-### 6. 画像の差し替え
+### 5. 画像の差し替え
 
 `public/nft-1.svg`〜`nft-4.svg`を実際のNFT画像（1024×1024px推奨）に差し替えます。
 
