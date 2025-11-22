@@ -21,12 +21,6 @@ function getClientIp(request: NextRequest): string {
   return "unknown";
 }
 
-// Check if IP is allowed for sponsored minting
-function isIpAllowed(ip: string): boolean {
-  const allowedIps = process.env.ALLOWED_IPS?.split(",").map((i) => i.trim()) || [];
-  return allowedIps.includes(ip);
-}
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -40,16 +34,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Check IP address
-    const clientIp = getClientIp(request);
     const venueSession = request.cookies.get("venue_session");
     const isVenueMode = venueSession?.value === "true";
 
-    if (!isVenueMode && !isIpAllowed(clientIp)) {
+    if (!isVenueMode) {
       return NextResponse.json(
         {
           success: false,
-          error: "IP not allowed for sponsored minting",
-          clientIp,
+          error: "Venue mode is not enabled",
         },
         { status: 403 }
       );

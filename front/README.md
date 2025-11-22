@@ -41,22 +41,36 @@ pnpm install
 cp .env.local.example .env.local
 ```
 
-`.env.local`を編集:
+`.env.local`の主な項目（`front/.env.local.example`に完全なテンプレートあり）:
 
 ```env
-# コントラクトアドレス（デプロイ後に設定）
-NEXT_PUBLIC_NFT_CONTRACT_ADDRESS=0xYourContractAddress
-NEXT_PUBLIC_NFT_CONTRACT_ADDRESS_TESTNET=0xYourTestnetContractAddress
-
-# スポンサーウォレットの秘密鍵（ガス代負担用）
-SPONSOR_WALLET_PRIVATE_KEY=0xYourPrivateKey
-
-# 使用するネットワーク（testnetを使う場合はtrueに設定）
+# ネットワーク選択
+# - Anvil（ローカル）を使う場合: USE_ANVIL=true
+# - Anvilを使わない場合: USE_ANVIL=false かつ USE_TESTNET=true/false で testnet|mainnet を切替
+USE_ANVIL=true
 USE_TESTNET=false
 
-# スポンサードミントを許可するIPアドレス（カンマ区切り）
-ALLOWED_IPS=127.0.0.1,::1,会場のIPアドレス
+# コントラクトアドレス
+# - ローカルAnvil用: デプロイ結果で更新
+NEXT_PUBLIC_NFT_CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+# - テストネット用（Polygon Amoyなど）
+NEXT_PUBLIC_NFT_CONTRACT_ADDRESS_TESTNET=0x0000000000000000000000000000000000000000
+
+# RPC URL（Anvil / Polygon Amoy / Polygon 本番）
+NEXT_PUBLIC_ANVIL_RPC_URL=http://localhost:8545
+NEXT_PUBLIC_POLYGON_AMOY_RPC_URL=https://rpc-amoy.polygon.technology
+NEXT_PUBLIC_POLYGON_RPC_URL=https://polygon-rpc.com
+
+# スポンサーウォレットの秘密鍵（スポンサードミント用／絶対にコミットしないこと）
+SPONSOR_WALLET_PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+# 会場向けログインパスワード（オプション: 会場端末のUI制限に使用）
+VENUE_LOGIN_PASSWORD=
 ```
+
+注意:
+- デフォルトはAnvil（ローカル）を想定しています。Anvilを使わずテストネットで動かす場合は、`USE_ANVIL=false` にして `USE_TESTNET` を `true` に設定してください。
+- `SPONSOR_WALLET_PRIVATE_KEY` はローカル開発用にAnvilのデフォルト鍵を例示しています。本番では絶対にこの値を使わず安全に管理してください。
 
 ### 3. 開発サーバーの起動
 
