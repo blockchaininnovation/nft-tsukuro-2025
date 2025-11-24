@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useConnection, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import { NFT_ABI } from "@/contracts/nft-abi";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 import { anvil, polygon, polygonAmoy } from "wagmi/chains";
 import { isAddress } from "viem";
+import { useEffect } from "react";
 
 interface NFTCardProps {
   id: number;
@@ -19,18 +20,12 @@ interface NFTCardProps {
 import { SuccessDialog } from "./success-dialog";
 
 export function NFTCard({ id, title, description, image, isVenueMode }: NFTCardProps) {
-  const { address, isConnected, chain } = useAccount();
+  const { address, isConnected, chain } = useConnection();
   const [isSponsoredMinting, setIsSponsoredMinting] = useState(false);
   const [sponsoredError, setSponsoredError] = useState<string | null>(null);
   const [manualAddress, setManualAddress] = useState("");
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [successTxHash, setSuccessTxHash] = useState("");
-
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
-
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  });
 
   // Select contract address based on current network
   const getContractAddress = () => {
@@ -48,6 +43,30 @@ export function NFTCard({ id, title, description, image, isVenueMode }: NFTCardP
   };
 
   const contractAddress = getContractAddress();
+
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const targetAddressForBalance = isVenueMode ? manualAddress : address;
+
+  const { data: balance, refetch: refetchBalance } = useReadContract({
+    address: contractAddress,
+    abi: NFT_ABI,
+    functionName: "balanceOf",
+    args: targetAddressForBalance && isAddress(targetAddressForBalance) ? [targetAddressForBalance, BigInt(id)] : undefined,
+    query: {
+      enabled: !!targetAddressForBalance && isAddress(targetAddressForBalance),
+    }
+  });
+
+  useEffect(() => {
+    if (isSuccess || showSuccessDialog) {
+      refetchBalance();
+    }
+  }, [isSuccess, showSuccessDialog, refetchBalance]);
 
   const handleMint = async () => {
     const targetAddress = isVenueMode ? manualAddress : address;
@@ -111,8 +130,8 @@ export function NFTCard({ id, title, description, image, isVenueMode }: NFTCardP
       writeContract({
         address: contractAddress,
         abi: NFT_ABI,
-        functionName: "mint",
-        args: [targetAddress, BigInt(id)],
+        functionName: "mintLocked",
+        args: [targetAddress, BigInt(id), BigInt(1), "0x"],
       });
     }
   };
@@ -139,6 +158,12 @@ export function NFTCard({ id, title, description, image, isVenueMode }: NFTCardP
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             {description}
           </p>
+
+          {targetAddressForBalance && isAddress(targetAddressForBalance) && (
+            <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
+              所持数: {balance != null ? balance.toString() : "確認中..."}
+            </p>
+          )}
 
           {isVenueMode && (
             <div className="mb-4">
@@ -183,7 +208,7 @@ export function NFTCard({ id, title, description, image, isVenueMode }: NFTCardP
           )}
           {error && (
             <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-              エラー: {error.message}
+              エラー: {error.message.includes("User denied") ? "キャンセルされました" : error.message}
             </p>
           )}
           {sponsoredError && (

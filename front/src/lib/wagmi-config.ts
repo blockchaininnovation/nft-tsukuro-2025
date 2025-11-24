@@ -4,10 +4,21 @@ import { injected } from "wagmi/connectors";
 
 // Network configuration with Anvil as default for local development
 // Switch networks via environment variables or wallet
+// Environment variables for network configuration
+const useAnvil = process.env.USE_ANVIL !== "false";
+const useTestnet = process.env.USE_TESTNET === "true";
+
+const getChains = () => {
+  if (useAnvil) {
+    return [anvil, polygonAmoy, polygon] as const;
+  }
+  return useTestnet ? [polygonAmoy, polygon, anvil] as const : [polygon, polygonAmoy, anvil] as const;
+};
+
 export const config = createConfig({
-  chains: [anvil, polygonAmoy, polygon],
+  chains: getChains(),
   connectors: [
-    injected(), // Metamask browser extension
+    injected(),
   ],
   transports: {
     [anvil.id]: http(process.env.NEXT_PUBLIC_ANVIL_RPC_URL || "http://localhost:8545"),

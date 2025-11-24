@@ -79,8 +79,8 @@ export async function POST(request: NextRequest) {
     const hash = await client.writeContract({
       address: contractAddress,
       abi: NFT_ABI,
-      functionName: "mint",
-      args: [to as Address, BigInt(tokenType)],
+      functionName: "mintLocked",
+      args: [to as Address, BigInt(tokenType), BigInt(1), "0x"],
     });
 
     return NextResponse.json({

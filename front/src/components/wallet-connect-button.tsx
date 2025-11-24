@@ -1,11 +1,23 @@
 "use client";
 
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useConnection, useConnect, useDisconnect, useSwitchChain, useConnectors } from "wagmi";
+import { useEffect } from "react";
+import { config } from "@/lib/wagmi-config";
 
 export function WalletConnectButton() {
-  const { address, isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { address, isConnected, chain } = useConnection();
+  const { connect } = useConnect();
+  const connectors = useConnectors();
   const { disconnect } = useDisconnect();
+  const { switchChain } = useSwitchChain();
+  const { chains } = config;
+  const defaultChain = chains[0];
+
+  useEffect(() => {
+    if (isConnected && address && chain?.id !== defaultChain.id) {
+      switchChain({ chainId: defaultChain.id });
+    }
+  }, [isConnected, address, chain, defaultChain.id, switchChain]);
 
   if (isConnected && address) {
     return (
