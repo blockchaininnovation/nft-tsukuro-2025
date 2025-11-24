@@ -72,7 +72,16 @@ VENUE_LOGIN_PASSWORD=
 - デフォルトはAnvil（ローカル）を想定しています。Anvilを使わずテストネットで動かす場合は、`USE_ANVIL=false` にして `USE_TESTNET` を `true` に設定してください。
 - `SPONSOR_WALLET_PRIVATE_KEY` はローカル開発用にAnvilのデフォルト鍵を例示しています。本番では絶対にこの値を使わず安全に管理してください。
 
-### 3. 開発サーバーの起動
+### 3. ABIのコピー
+
+コントラクトのABIファイルをコピーします。
+（事前に`contract`ディレクトリで`forge build`を実行してビルドしておく必要があります）
+
+```bash
+cp ../contract/out/SoulboundToken.sol/SoulboundToken.json src/contracts/abi/
+```
+
+### 4. 開発サーバーの起動
 
 ```bash
 pnpm dev
