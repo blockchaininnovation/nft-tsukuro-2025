@@ -10,6 +10,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     mapping(uint256 => bool) private _locked;
     bytes4 public constant IID_IERC5192 = 0xb45a3c0e;
 
+    
     constructor(address initialOwner) ERC1155("http://localhost:8000/{id}.json") Ownable(initialOwner) {}
 
     // ===== IERC5192 =====
@@ -29,7 +30,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         }
         require(amount == 1, "SBT: amount must be 1");
         
-        // Fix: Prevent duplicate minting by same user
+        // 修正 (重複チェック)
         require(balanceOf(to, id) == 0, "SBT: User already has this token");
 
         _mint(to, id, amount, data);
@@ -53,13 +54,11 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         virtual
         override
     {
-        // Check 1: Transfer is disabled (except mint/burn)
         if (from != address(0) && to != address(0)) {
             revert("SBT: token is locked");
         }
 
-        // Check 2: Lock check (Skipped during minting)
-        // Fix: Allow minting even if ID is locked by someone else
+        // 修正 (Mint時スキップ)
         if (from != address(0)) {
             for (uint256 i = 0; i < ids.length; i++) {
                 if (_locked[ids[i]]) {
