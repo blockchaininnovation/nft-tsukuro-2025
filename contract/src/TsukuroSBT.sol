@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
+// Compatible with OpenZeppelin Contracts ^5.5.0
 pragma solidity ^0.8.27;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IERC5192.sol";
+import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {IERC5192} from "./IERC5192.sol";
 
 contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     mapping(uint256 => bool) private _locked;
     bytes4 public constant IID_IERC5192 = 0xb45a3c0e;
 
-    constructor() ERC1155("ipfs://YOUR_BASE_CID_HERE/{id}.json") Ownable(msg.sender) {}
+    constructor(address initialOwner) ERC1155("http://localhost:8000/{id}.json") Ownable(initialOwner) {}
 
-    // ===== IERC5192 Implementation =====
+    // ===== IERC5192 =====
     function locked(uint256 tokenId) public view override returns (bool) {
         require(_exists(tokenId), "SBT: query for nonexistent token");
         return _locked[tokenId];
@@ -27,7 +28,8 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
             require(to == msg.sender, "SBT: only owner can set recipient");
         }
         require(amount == 1, "SBT: amount must be 1");
-
+        
+        // Fix: Prevent duplicate minting by same user
         require(balanceOf(to, id) == 0, "SBT: User already has this token");
 
         _mint(to, id, amount, data);
@@ -41,7 +43,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         return interfaceId == IID_IERC5192 || super.supportsInterface(interfaceId);
     }
 
-    // ===== ERC1155 Overrides =====
+    // ===== ERC1155 =====
     function setURI(string memory newuri) public onlyOwner {
         _setURI(newuri);
     }
@@ -51,12 +53,13 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         virtual
         override
     {
-        // 転送禁止ロジック
+        // Check 1: Transfer is disabled (except mint/burn)
         if (from != address(0) && to != address(0)) {
             revert("SBT: token is locked");
         }
 
-        // ロックチェック (Mint時以外のみ実行)
+        // Check 2: Lock check (Skipped during minting)
+        // Fix: Allow minting even if ID is locked by someone else
         if (from != address(0)) {
             for (uint256 i = 0; i < ids.length; i++) {
                 if (_locked[ids[i]]) {
