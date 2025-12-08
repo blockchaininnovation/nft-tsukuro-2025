@@ -5,21 +5,30 @@ import { polygon, polygonAmoy, foundry } from "viem/chains";
 import { NFT_ABI } from "@/contracts/nft-abi";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 
-// Helper function to get client IP
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  const realIp = request.headers.get("x-real-ip");
+// Team metadata configuration
+const TEAM_METADATA = {
+  0: {
+    name: "Tsukuro SBT - Team A",
+    description: "Tsukuro 2025 参加記念SBT - Team A",
+    hasSerial: false,
+  },
+  1: {
+    name: "Tsukuro SBT - Team B",
+    description: "Tsukuro 2025 参加記念SBT - Team B",
+    hasSerial: false,
+  },
+  2: {
+    name: "Tsukuro SBT - Team C",
+    description: "Tsukuro 2025 参加記念SBT - Team C",
+    hasSerial: true,
+  },
+  3: {
+    name: "Tsukuro SBT - Team D",
+    description: "Tsukuro 2025 参加記念SBT - Team D",
+    hasSerial: true,
+  },
+} as const;
 
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-
-  if (realIp) {
-    return realIp;
-  }
-
-  return "unknown";
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,7 +42,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check IP address
+    const teamId = Number(tokenType);
+    if (teamId < 0 || teamId > 3) {
+      return NextResponse.json(
+        { success: false, error: "Invalid team ID (must be 0-3)" },
+        { status: 400 }
+      );
+    }
+
+    // Check venue mode
     const venueSession = request.cookies.get("venue_session");
     const isVenueMode = venueSession?.value === "true";
 
@@ -58,9 +75,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Determine network (default to Anvil for local development)
+    // Determine network
     const useTestnet = process.env.USE_TESTNET === "true";
-    const useAnvil = process.env.USE_ANVIL !== "false"; // Default to Anvil
+    const useAnvil = process.env.USE_ANVIL !== "false";
     const chain = useAnvil ? foundry : (useTestnet ? polygonAmoy : polygon);
     const contractAddress = useAnvil
       ? CONTRACT_ADDRESSES.anvil
@@ -69,18 +86,19 @@ export async function POST(request: NextRequest) {
     // Create wallet client
     const account = privateKeyToAccount(privateKey as `0x${string}`);
     const rpcUrl = useAnvil ? process.env.NEXT_PUBLIC_ANVIL_RPC_URL : undefined;
-    const client = createWalletClient({
+
+    const walletClient = createWalletClient({
       account,
       chain,
       transport: http(rpcUrl),
     });
 
-    // Execute mint transaction
-    const hash = await client.writeContract({
+    // Mint using base URI (metadata hosted on GitHub Pages)
+    const hash = await walletClient.writeContract({
       address: contractAddress,
       abi: NFT_ABI,
       functionName: "mintLocked",
-      args: [to as Address, BigInt(tokenType), BigInt(1), "0x"],
+      args: [to as Address, BigInt(teamId), BigInt(1), "0x"],
     });
 
     return NextResponse.json({
