@@ -52,39 +52,39 @@ contract TsukuroSBTTest is Test {
     }
 
     function test_isRevealed_afterTimestamp() public {
-        // Warp to after reveal timestamp (2026/01/01 00:00:00 UTC)
-        vm.warp(1735689600 + 1);
+        // Warp to after reveal timestamp (2026/01/01 00:00:00 JST)
+        vm.warp(1767193200 + 1);
         assertTrue(tsukuroSBT.isRevealed());
     }
 
     function test_isRevealed_exactTimestamp() public {
-        vm.warp(1735689600);
+        vm.warp(1767193200);
         assertTrue(tsukuroSBT.isRevealed());
     }
 
     // ===== Mint Tests - Team 0 (No Serial) =====
     function test_mintLocked_team0_noSerial() public {
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 0, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_A, 1, "");
 
         // Token ID should be 0 (team 0, no serial)
         assertEq(tsukuroSBT.balanceOf(alice, 0), 1);
         assertTrue(tsukuroSBT.locked(0));
     }
 
-    function test_mintLocked_team1_noSerial() public {
+    function test_mintLocked_team1_withSerial() public {
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 1, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_B, 1, "");
 
-        // Token ID should be 10000 (team 1, no serial)
-        assertEq(tsukuroSBT.balanceOf(alice, 10000), 1);
-        assertTrue(tsukuroSBT.locked(10000));
+        // Token ID should be 10001 (team 1, serial 1 - Team B now has serial!)
+        assertEq(tsukuroSBT.balanceOf(alice, 10001), 1);
+        assertTrue(tsukuroSBT.locked(10001));
     }
 
     // ===== Mint Tests - Team 2 (With Serial) =====
     function test_mintLocked_team2_withSerial() public {
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
 
         // Token ID should be 20001 (team 2, serial 1)
         assertEq(tsukuroSBT.balanceOf(alice, 20001), 1);
@@ -93,8 +93,8 @@ contract TsukuroSBTTest is Test {
 
     function test_mintLocked_team2_serialIncrement() public {
         vm.startPrank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
-        tsukuroSBT.mintLocked(bob, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
+        tsukuroSBT.mintLocked(bob, TsukuroSBT.Team.TEAM_C, 1, "");
         vm.stopPrank();
 
         // Alice gets serial 1, Bob gets serial 2
@@ -102,78 +102,75 @@ contract TsukuroSBTTest is Test {
         assertEq(tsukuroSBT.balanceOf(bob, 20002), 1);
     }
 
-    function test_mintLocked_team3_serialIncrement() public {
+    function test_mintLocked_teamB_serialIncrement() public {
         vm.startPrank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 3, 1, "");
-        tsukuroSBT.mintLocked(bob, 3, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_B, 1, "");
+        tsukuroSBT.mintLocked(bob, TsukuroSBT.Team.TEAM_B, 1, "");
         vm.stopPrank();
 
         // Alice gets serial 1, Bob gets serial 2
-        assertEq(tsukuroSBT.balanceOf(alice, 30001), 1);
-        assertEq(tsukuroSBT.balanceOf(bob, 30002), 1);
+        assertEq(tsukuroSBT.balanceOf(alice, 10001), 1);
+        assertEq(tsukuroSBT.balanceOf(bob, 10002), 1);
     }
 
     function test_getNextSerialNumber() public {
-        assertEq(tsukuroSBT.getNextSerialNumber(2), 1);
+        assertEq(tsukuroSBT.getNextSerialNumber(TsukuroSBT.Team.TEAM_C), 1);
 
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
 
-        assertEq(tsukuroSBT.getNextSerialNumber(2), 2);
+        assertEq(tsukuroSBT.getNextSerialNumber(TsukuroSBT.Team.TEAM_C), 2);
     }
 
     // ===== Duplicate Mint Tests =====
     function test_duplicateMint_sameTeam_reverts() public {
         vm.startPrank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
 
         vm.expectRevert(bytes("SBT: already minted for this team"));
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
         vm.stopPrank();
     }
 
     function test_mintDifferentTeams_succeeds() public {
         vm.startPrank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 0, 1, "");
-        tsukuroSBT.mintLocked(alice, 1, 1, "");
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
-        tsukuroSBT.mintLocked(alice, 3, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_A, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_B, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_D, 1, "");
         vm.stopPrank();
 
-        assertEq(tsukuroSBT.balanceOf(alice, 0), 1);      // Team 0
-        assertEq(tsukuroSBT.balanceOf(alice, 10000), 1);  // Team 1
-        assertEq(tsukuroSBT.balanceOf(alice, 20001), 1);  // Team 2, serial 1
-        assertEq(tsukuroSBT.balanceOf(alice, 30001), 1);  // Team 3, serial 1
+        assertEq(tsukuroSBT.balanceOf(alice, 0), 1);      // Team A (0), no serial
+        assertEq(tsukuroSBT.balanceOf(alice, 10001), 1);  // Team B (1), serial 1
+        assertEq(tsukuroSBT.balanceOf(alice, 20001), 1);  // Team C (2), serial 1
+        assertEq(tsukuroSBT.balanceOf(alice, 30000), 1);  // Team D (3), no serial
     }
 
     function test_hasMintedForTeam() public {
-        assertFalse(tsukuroSBT.hasMintedForTeam(alice, 2));
+        assertFalse(tsukuroSBT.hasMintedForTeam(alice, TsukuroSBT.Team.TEAM_C));
 
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
 
-        assertTrue(tsukuroSBT.hasMintedForTeam(alice, 2));
-        assertFalse(tsukuroSBT.hasMintedForTeam(alice, 3));
+        assertTrue(tsukuroSBT.hasMintedForTeam(alice, TsukuroSBT.Team.TEAM_C));
+        assertFalse(tsukuroSBT.hasMintedForTeam(alice, TsukuroSBT.Team.TEAM_D));
     }
 
     // ===== Invalid Team ID Tests =====
-    function test_mintLocked_invalidTeamId_reverts() public {
-        vm.prank(ownerAddr);
-        vm.expectRevert(bytes("SBT: invalid team ID"));
-        tsukuroSBT.mintLocked(alice, 4, 1, "");
-    }
+    // Note: This test is removed because Solidity prevents invalid enum values at compile time
+    // The team validation in the contract is still in place for safety
 
     // ===== Non-Owner Mint Tests =====
     function test_NonOwner_MintToSelf_Succeeds() public {
         vm.prank(alice);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
         assertEq(tsukuroSBT.balanceOf(alice, 20001), 1);
     }
 
     function test_NonOwner_MintToOther_Reverts() public {
         vm.prank(alice);
         vm.expectRevert(bytes("SBT: only owner can set recipient"));
-        tsukuroSBT.mintLocked(bob, 2, 1, "");
+        tsukuroSBT.mintLocked(bob, TsukuroSBT.Team.TEAM_C, 1, "");
     }
 
     // ===== mintLockedWithURI Tests =====
@@ -181,7 +178,7 @@ contract TsukuroSBTTest is Test {
         string memory testURI = "ipfs://QmTest123/metadata.json";
 
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLockedWithURI(alice, 2, 1, "", testURI);
+        tsukuroSBT.mintLockedWithURI(alice, TsukuroSBT.Team.TEAM_C, 1, "", testURI);
 
         assertEq(tsukuroSBT.balanceOf(alice, 20001), 1);
         assertEq(tsukuroSBT.uri(20001), testURI);
@@ -190,7 +187,7 @@ contract TsukuroSBTTest is Test {
     function test_mintLockedWithURI_onlyOwner() public {
         vm.prank(alice);
         vm.expectRevert();
-        tsukuroSBT.mintLockedWithURI(alice, 2, 1, "", "ipfs://test");
+        tsukuroSBT.mintLockedWithURI(alice, TsukuroSBT.Team.TEAM_C, 1, "", "ipfs://test");
     }
 
     // ===== URI Tests =====
@@ -199,7 +196,7 @@ contract TsukuroSBTTest is Test {
         tsukuroSBT.setUnrevealedBaseURI("https://example.com/unrevealed/");
 
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
 
         // Before reveal, should return unrevealed URI
         assertEq(tsukuroSBT.uri(20001), "https://example.com/unrevealed/2.json");
@@ -210,14 +207,14 @@ contract TsukuroSBTTest is Test {
         tsukuroSBT.setRevealedBaseURI("https://example.com/revealed/");
 
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 3, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_D, 1, "");
 
         // Warp to after reveal
-        vm.warp(1735689600 + 1);
+        vm.warp(1767193200 + 1);
 
-        // After reveal, should return revealed URI with serial
-        // Team 3 doesn't have variant, so URL is straightforward
-        assertEq(tsukuroSBT.uri(30001), "https://example.com/revealed/3/1.json");
+        // After reveal, should return revealed URI
+        // Team D doesn't have serial number anymore!
+        assertEq(tsukuroSBT.uri(30000), "https://example.com/revealed/3/0.json");
     }
 
     function test_uri_individualOverride() public {
@@ -225,12 +222,12 @@ contract TsukuroSBTTest is Test {
 
         vm.startPrank(ownerAddr);
         tsukuroSBT.setRevealedBaseURI("https://example.com/revealed/");
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
         tsukuroSBT.setTokenURI(20001, customURI);
         vm.stopPrank();
 
         // Warp to after reveal
-        vm.warp(1735689600 + 1);
+        vm.warp(1767193200 + 1);
 
         // Individual URI should override base URI
         assertEq(tsukuroSBT.uri(20001), customURI);
@@ -245,7 +242,7 @@ contract TsukuroSBTTest is Test {
     // ===== Transfer Tests =====
     function test_TransferRevertsWhenLocked() public {
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
 
         vm.prank(alice);
         vm.expectRevert(bytes("SBT: token is locked"));
@@ -257,12 +254,12 @@ contract TsukuroSBTTest is Test {
         uint256[] memory amounts = new uint256[](2);
 
         vm.startPrank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
-        tsukuroSBT.mintLocked(alice, 3, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_C, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_D, 1, "");
         vm.stopPrank();
 
-        ids[0] = 20001;
-        ids[1] = 30001;
+        ids[0] = 20001;  // Team C, serial 1
+        ids[1] = 30000;  // Team D, no serial
         amounts[0] = 1;
         amounts[1] = 1;
 
@@ -277,34 +274,34 @@ contract TsukuroSBTTest is Test {
         tsukuroSBT.locked(999);
     }
 
-    // ===== Team 2 Variant Tests =====
-    function test_team2Variant_differentTimestamps() public {
+    // ===== Team B Variant Tests =====
+    function test_teamBVariant_differentTimestamps() public {
         vm.startPrank(ownerAddr);
         tsukuroSBT.setRevealedBaseURI("https://example.com/revealed/");
 
         // Mint at time 100
         vm.warp(100);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_B, 1, "");
 
         // Mint at time 200
         vm.warp(200);
-        tsukuroSBT.mintLocked(bob, 2, 1, "");
+        tsukuroSBT.mintLocked(bob, TsukuroSBT.Team.TEAM_B, 1, "");
         vm.stopPrank();
 
         // Warp to after reveal
-        vm.warp(1735689600 + 1);
+        vm.warp(1767193200 + 1);
 
-        // URIs should be different due to different timestamps
-        string memory aliceURI = tsukuroSBT.uri(20001);
-        string memory bobURI = tsukuroSBT.uri(20002);
+        // URIs should be different due to different timestamps at mint
+        string memory aliceURI = tsukuroSBT.uri(10001);  // Team B is now 1
+        string memory bobURI = tsukuroSBT.uri(10002);
 
-        // Both should contain "https://example.com/revealed/2/" and ".json"
+        // Both should contain "https://example.com/revealed/1/" and ".json"
         // but variant numbers might be different
         assertTrue(bytes(aliceURI).length > 0);
         assertTrue(bytes(bobURI).length > 0);
     }
 
-    function test_team2Variant_rangeCheck() public {
+    function test_teamBVariant_rangeCheck() public {
         vm.prank(ownerAddr);
         tsukuroSBT.setRevealedBaseURI("https://example.com/revealed/");
 
@@ -313,54 +310,79 @@ contract TsukuroSBTTest is Test {
         for (uint256 i = 0; i < 10; i++) {
             address recipient = address(uint160(0x1000 + i));
             vm.warp(block.timestamp + 1);
-            tsukuroSBT.mintLocked(recipient, 2, 1, "");
+            tsukuroSBT.mintLocked(recipient, TsukuroSBT.Team.TEAM_B, 1, "");
         }
         vm.stopPrank();
 
         // Warp to after reveal
-        vm.warp(1735689600 + 1);
+        vm.warp(1767193200 + 1);
 
         // Check that all URIs are valid (contain variant 0-3)
         for (uint256 i = 1; i <= 10; i++) {
-            string memory tokenURI = tsukuroSBT.uri(20000 + i);
+            string memory tokenURI = tsukuroSBT.uri(10000 + i);  // Team B uses 10000 base
             assertTrue(bytes(tokenURI).length > 0);
             // URI should contain "-0.json", "-1.json", "-2.json", or "-3.json"
         }
     }
 
-    function test_team2Variant_deterministicSameToken() public {
+    function test_teamBVariant_deterministicSameToken() public {
         vm.prank(ownerAddr);
         tsukuroSBT.setRevealedBaseURI("https://example.com/revealed/");
 
         vm.prank(ownerAddr);
-        tsukuroSBT.mintLocked(alice, 2, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_B, 1, "");
 
         // Warp to after reveal
-        vm.warp(1735689600 + 1);
+        vm.warp(1767193200 + 1);
 
         // Calling uri() multiple times should return the same result
-        string memory uri1 = tsukuroSBT.uri(20001);
-        string memory uri2 = tsukuroSBT.uri(20001);
+        string memory uri1 = tsukuroSBT.uri(10001);  // Team B token
+        string memory uri2 = tsukuroSBT.uri(10001);
 
         assertEq(uri1, uri2, "URI should be deterministic for same token");
+    }
+
+    function test_teamB_variantStoredAtMint() public {
+        vm.prank(ownerAddr);
+        tsukuroSBT.setRevealedBaseURI("https://example.com/revealed/");
+
+        // Mint Team B token
+        vm.prank(ownerAddr);
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_B, 1, "");
+
+        // Warp to after reveal
+        vm.warp(1767193200 + 1);
+
+        // Get URI twice - should be identical (variant stored at mint)
+        string memory uri1 = tsukuroSBT.uri(10001);
+
+        // Warp forward in time
+        vm.warp(1767193200 + 1000);
+
+        // URI should still be the same (not affected by current timestamp)
+        string memory uri2 = tsukuroSBT.uri(10001);
+
+        assertEq(uri1, uri2, "Variant should be stored and deterministic");
     }
 
     function test_otherTeams_noVariant() public {
         vm.startPrank(ownerAddr);
         tsukuroSBT.setRevealedBaseURI("https://example.com/revealed/");
 
-        tsukuroSBT.mintLocked(alice, 0, 1, "");
-        tsukuroSBT.mintLocked(bob, 1, 1, "");
+        tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_A, 1, "");
+        tsukuroSBT.mintLocked(bob, TsukuroSBT.Team.TEAM_C, 1, "");  // Changed from TEAM_B
         address charlie = address(0xC);
-        tsukuroSBT.mintLocked(charlie, 3, 1, "");
+        tsukuroSBT.mintLocked(charlie, TsukuroSBT.Team.TEAM_D, 1, "");
         vm.stopPrank();
 
         // Warp to after reveal
-        vm.warp(1735689600 + 1);
+        vm.warp(1767193200 + 1);
 
-        // Teams 0, 1, 3 should NOT have variant in URI
+        // Team A: no serial
         assertEq(tsukuroSBT.uri(0), "https://example.com/revealed/0/0.json");
-        assertEq(tsukuroSBT.uri(10000), "https://example.com/revealed/1/0.json");
-        assertEq(tsukuroSBT.uri(30001), "https://example.com/revealed/3/1.json");
+        // Team C: has serial
+        assertEq(tsukuroSBT.uri(20001), "https://example.com/revealed/2/1.json");
+        // Team D: no serial anymore!
+        assertEq(tsukuroSBT.uri(30000), "https://example.com/revealed/3/0.json");
     }
 }

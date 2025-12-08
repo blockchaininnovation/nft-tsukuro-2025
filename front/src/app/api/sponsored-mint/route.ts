@@ -15,7 +15,7 @@ const TEAM_METADATA = {
   1: {
     name: "Tsukuro SBT - Team B",
     description: "Tsukuro 2025 参加記念SBT - Team B",
-    hasSerial: false,
+    hasSerial: true,
   },
   2: {
     name: "Tsukuro SBT - Team C",
@@ -25,7 +25,7 @@ const TEAM_METADATA = {
   3: {
     name: "Tsukuro SBT - Team D",
     description: "Tsukuro 2025 参加記念SBT - Team D",
-    hasSerial: true,
+    hasSerial: false,
   },
 } as const;
 

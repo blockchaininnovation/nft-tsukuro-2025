@@ -13,9 +13,9 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     // ===== Enums =====
     enum Team {
         TEAM_A, // Team 0 - no serial number
-        TEAM_D, // Team 1 - no serial number
-        TEAM_B, // Team B (2) - with serial number
-        TEAM_C // Team C (3) - with serial number
+        TEAM_B, // Team 1 - with serial number and variant
+        TEAM_C, // Team 2 - with serial number
+        TEAM_D  // Team 3 - no serial number
     }
 
     // ===== Constants =====
@@ -35,6 +35,9 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
 
     // Track if an address has minted for a specific team
     mapping(bytes32 => bool) private _hasMintedForTeam;
+
+    // Store Team B variant at mint time (deterministic)
+    mapping(uint256 => uint256) private _teamBVariant;
 
     // Individual token URIs (IPFS CIDs)
     mapping(uint256 => string) private _tokenURIs;
@@ -96,6 +99,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         require(amount == 1, "SBT: amount must be 1");
 
         uint256 teamId = uint256(team);
+        require(teamId <= 3, "SBT: invalid team ID");
 
         // Check duplicate mint per team
         bytes32 key = keccak256(abi.encodePacked(to, teamId));
@@ -104,6 +108,14 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
 
         // Generate token ID
         uint256 tokenId = _generateTokenId(team);
+
+        // Store Team B variant at mint time (deterministic)
+        if (team == Team.TEAM_B) {
+            uint256 seed = uint256(
+                keccak256(abi.encodePacked(tokenId, to, block.timestamp))
+            );
+            _teamBVariant[tokenId] = seed % 4; // 0-3 for 4 variants
+        }
 
         _mint(to, tokenId, amount, data);
 
@@ -121,6 +133,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         require(amount == 1, "SBT: amount must be 1");
 
         uint256 teamId = uint256(team);
+        require(teamId <= 3, "SBT: invalid team ID");
 
         // Check duplicate mint per team
         bytes32 key = keccak256(abi.encodePacked(to, teamId));
@@ -129,6 +142,14 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
 
         // Generate token ID
         uint256 tokenId = _generateTokenId(team);
+
+        // Store Team B variant at mint time (deterministic)
+        if (team == Team.TEAM_B) {
+            uint256 seed = uint256(
+                keccak256(abi.encodePacked(tokenId, to, block.timestamp))
+            );
+            _teamBVariant[tokenId] = seed % 4; // 0-3 for 4 variants
+        }
 
         // Set token URI
         _tokenURIs[tokenId] = tokenURI_;
@@ -140,12 +161,9 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     }
 
     // ===== Team B Variant Function =====
-    // Team B only: Deterministic variant selection based on tokenId and block.timestamp
-    function _getTeam2Variant(uint256 tokenId) internal view returns (uint256) {
-        uint256 seed = uint256(
-            keccak256(abi.encodePacked(tokenId, block.timestamp))
-        );
-        return seed % 4; // 0-3 for 4 variants
+    // Team B only: Returns stored variant from mint time
+    function _getTeamBVariant(uint256 tokenId) internal view returns (uint256) {
+        return _teamBVariant[tokenId];
     }
 
     // ===== URI Functions =====
@@ -163,12 +181,12 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
             // After reveal
             if (team == Team.TEAM_B) {
                 // Team B only: Include variant number in filename
-                uint256 variant = _getTeam2Variant(tokenId);
+                uint256 variant = _getTeamBVariant(tokenId);
                 return
                     string(
                         abi.encodePacked(
                             _revealedBaseURI,
-                            "2/",
+                            "1/",
                             serialNumber.toString(),
                             "-",
                             variant.toString(),
