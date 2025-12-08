@@ -140,10 +140,10 @@ contract TsukuroSBTTest is Test {
         tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_D, 1, "");
         vm.stopPrank();
 
-        assertEq(tsukuroSBT.balanceOf(alice, 0), 1);      // Team A (0), no serial
-        assertEq(tsukuroSBT.balanceOf(alice, 10001), 1);  // Team B (1), serial 1
-        assertEq(tsukuroSBT.balanceOf(alice, 20001), 1);  // Team C (2), serial 1
-        assertEq(tsukuroSBT.balanceOf(alice, 30000), 1);  // Team D (3), no serial
+        assertEq(tsukuroSBT.balanceOf(alice, 0), 1); // Team A (0), no serial
+        assertEq(tsukuroSBT.balanceOf(alice, 10001), 1); // Team B (1), serial 1
+        assertEq(tsukuroSBT.balanceOf(alice, 20001), 1); // Team C (2), serial 1
+        assertEq(tsukuroSBT.balanceOf(alice, 30000), 1); // Team D (3), no serial
     }
 
     function test_hasMintedForTeam() public {
@@ -258,8 +258,8 @@ contract TsukuroSBTTest is Test {
         tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_D, 1, "");
         vm.stopPrank();
 
-        ids[0] = 20001;  // Team C, serial 1
-        ids[1] = 30000;  // Team D, no serial
+        ids[0] = 20001; // Team C, serial 1
+        ids[1] = 30000; // Team D, no serial
         amounts[0] = 1;
         amounts[1] = 1;
 
@@ -292,7 +292,7 @@ contract TsukuroSBTTest is Test {
         vm.warp(1767193200 + 1);
 
         // URIs should be different due to different timestamps at mint
-        string memory aliceURI = tsukuroSBT.uri(10001);  // Team B is now 1
+        string memory aliceURI = tsukuroSBT.uri(10001); // Team B is now 1
         string memory bobURI = tsukuroSBT.uri(10002);
 
         // Both should contain "https://example.com/revealed/1/" and ".json"
@@ -319,7 +319,7 @@ contract TsukuroSBTTest is Test {
 
         // Check that all URIs are valid (contain variant 0-3)
         for (uint256 i = 1; i <= 10; i++) {
-            string memory tokenURI = tsukuroSBT.uri(10000 + i);  // Team B uses 10000 base
+            string memory tokenURI = tsukuroSBT.uri(10000 + i); // Team B uses 10000 base
             assertTrue(bytes(tokenURI).length > 0);
             // URI should contain "-0.json", "-1.json", "-2.json", or "-3.json"
         }
@@ -336,7 +336,7 @@ contract TsukuroSBTTest is Test {
         vm.warp(1767193200 + 1);
 
         // Calling uri() multiple times should return the same result
-        string memory uri1 = tsukuroSBT.uri(10001);  // Team B token
+        string memory uri1 = tsukuroSBT.uri(10001); // Team B token
         string memory uri2 = tsukuroSBT.uri(10001);
 
         assertEq(uri1, uri2, "URI should be deterministic for same token");
@@ -370,7 +370,7 @@ contract TsukuroSBTTest is Test {
         tsukuroSBT.setRevealedBaseURI("https://example.com/revealed/");
 
         tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_A, 1, "");
-        tsukuroSBT.mintLocked(bob, TsukuroSBT.Team.TEAM_C, 1, "");  // Changed from TEAM_B
+        tsukuroSBT.mintLocked(bob, TsukuroSBT.Team.TEAM_C, 1, ""); // Changed from TEAM_B
         address charlie = address(0xC);
         tsukuroSBT.mintLocked(charlie, TsukuroSBT.Team.TEAM_D, 1, "");
         vm.stopPrank();

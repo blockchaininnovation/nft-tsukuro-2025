@@ -15,7 +15,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         TEAM_A, // Team 0 - no serial number
         TEAM_B, // Team 1 - with serial number and variant
         TEAM_C, // Team 2 - with serial number
-        TEAM_D  // Team 3 - no serial number
+        TEAM_D // Team 3 - no serial number
     }
 
     // ===== Constants =====
@@ -87,12 +87,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     }
 
     // ===== Soulbound Logic =====
-    function mintLocked(
-        address to,
-        Team team,
-        uint256 amount,
-        bytes memory data
-    ) external {
+    function mintLocked(address to, Team team, uint256 amount, bytes memory data) external {
         if (msg.sender != owner()) {
             require(to == msg.sender, "SBT: only owner can set recipient");
         }
@@ -111,9 +106,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
 
         // Store Team B variant at mint time (deterministic)
         if (team == Team.TEAM_B) {
-            uint256 seed = uint256(
-                keccak256(abi.encodePacked(tokenId, to, block.timestamp))
-            );
+            uint256 seed = uint256(keccak256(abi.encodePacked(tokenId, to, block.timestamp)));
             _teamBVariant[tokenId] = seed % 4; // 0-3 for 4 variants
         }
 
@@ -123,13 +116,10 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         emit Locked(tokenId);
     }
 
-    function mintLockedWithURI(
-        address to,
-        Team team,
-        uint256 amount,
-        bytes memory data,
-        string memory tokenURI_
-    ) external onlyOwner {
+    function mintLockedWithURI(address to, Team team, uint256 amount, bytes memory data, string memory tokenURI_)
+        external
+        onlyOwner
+    {
         require(amount == 1, "SBT: amount must be 1");
 
         uint256 teamId = uint256(team);
@@ -145,9 +135,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
 
         // Store Team B variant at mint time (deterministic)
         if (team == Team.TEAM_B) {
-            uint256 seed = uint256(
-                keccak256(abi.encodePacked(tokenId, to, block.timestamp))
-            );
+            uint256 seed = uint256(keccak256(abi.encodePacked(tokenId, to, block.timestamp)));
             _teamBVariant[tokenId] = seed % 4; // 0-3 for 4 variants
         }
 
@@ -182,40 +170,17 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
             if (team == Team.TEAM_B) {
                 // Team B only: Include variant number in filename
                 uint256 variant = _getTeamBVariant(tokenId);
-                return
-                    string(
-                        abi.encodePacked(
-                            _revealedBaseURI,
-                            "1/",
-                            serialNumber.toString(),
-                            "-",
-                            variant.toString(),
-                            ".json"
-                        )
-                    );
+                return string(
+                    abi.encodePacked(_revealedBaseURI, "1/", serialNumber.toString(), "-", variant.toString(), ".json")
+                );
             } else {
                 // Teams A, C, D: Standard filename
                 return
-                    string(
-                        abi.encodePacked(
-                            _revealedBaseURI,
-                            teamId.toString(),
-                            "/",
-                            serialNumber.toString(),
-                            ".json"
-                        )
-                    );
+                    string(abi.encodePacked(_revealedBaseURI, teamId.toString(), "/", serialNumber.toString(), ".json"));
             }
         } else {
             // Before reveal: {unrevealedBaseURI}{teamId}.json
-            return
-                string(
-                    abi.encodePacked(
-                        _unrevealedBaseURI,
-                        teamId.toString(),
-                        ".json"
-                    )
-                );
+            return string(abi.encodePacked(_unrevealedBaseURI, teamId.toString(), ".json"));
         }
     }
 
@@ -227,10 +192,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         _revealedBaseURI = baseURI;
     }
 
-    function setTokenURI(
-        uint256 tokenId,
-        string memory tokenURI_
-    ) external onlyOwner {
+    function setTokenURI(uint256 tokenId, string memory tokenURI_) external onlyOwner {
         require(_exists(tokenId), "SBT: URI set for nonexistent token");
         _tokenURIs[tokenId] = tokenURI_;
     }
@@ -241,30 +203,23 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         return _nextSerialNumber[teamId] + 1;
     }
 
-    function hasMintedForTeam(
-        address account,
-        Team team
-    ) external view returns (bool) {
+    function hasMintedForTeam(address account, Team team) external view returns (bool) {
         uint256 teamId = uint256(team);
         bytes32 key = keccak256(abi.encodePacked(account, teamId));
         return _hasMintedForTeam[key];
     }
 
     // ===== ERC165 =====
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(ERC1155) returns (bool) {
-        return
-            interfaceId == IID_IERC5192 || super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155) returns (bool) {
+        return interfaceId == IID_IERC5192 || super.supportsInterface(interfaceId);
     }
 
     // ===== Transfer Restriction =====
-    function _update(
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts
-    ) internal virtual override {
+    function _update(address from, address to, uint256[] memory ids, uint256[] memory amounts)
+        internal
+        virtual
+        override
+    {
         // Block transfers (except mint and burn)
         if (from != address(0) && to != address(0)) {
             revert("SBT: token is locked");
