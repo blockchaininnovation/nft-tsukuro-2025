@@ -29,9 +29,16 @@ export function SuccessDialog({ isOpen, onClose, txHash }: SuccessDialogProps) {
       }`}
     >
       {/* Backdrop */}
-      <div
+      <button
+        type="button"
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === "Escape" || e.key === "Enter") {
+            onClose();
+          }
+        }}
+        aria-label="ダイアログを閉じる"
       />
 
       {/* Dialog Content */}
@@ -48,7 +55,10 @@ export function SuccessDialog({ isOpen, onClose, txHash }: SuccessDialogProps) {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              role="img"
+              aria-label="成功"
             >
+              <title>成功</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -80,6 +90,7 @@ export function SuccessDialog({ isOpen, onClose, txHash }: SuccessDialogProps) {
           </div>
 
           <button
+            type="button"
             onClick={onClose}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
           >

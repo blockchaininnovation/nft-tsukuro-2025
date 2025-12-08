@@ -30,7 +30,7 @@ export default function VenueLoginPage() {
       }
     } catch (err) {
       setError(
-        "An error occurred" + (err instanceof Error ? `: ${err.message}` : ""),
+        `An error occurred${err instanceof Error ? `: ${err.message}` : ""}`,
       );
     } finally {
       setIsLoading(false);

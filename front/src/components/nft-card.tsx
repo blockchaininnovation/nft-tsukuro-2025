@@ -9,7 +9,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { anvil, polygon, polygonAmoy } from "wagmi/chains";
+import { polygon, polygonAmoy } from "wagmi/chains";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 import { NFT_ABI } from "@/contracts/nft-abi";
 
@@ -126,7 +126,7 @@ export function NFTCard({
         setIsSponsoredMinting(false);
         return;
       }
-    } catch (err) {
+    } catch (_err) {
       setSponsoredError("スポンサードミントの確認に失敗しました");
       if (isVenueMode) {
         alert("エラーが発生しました");
