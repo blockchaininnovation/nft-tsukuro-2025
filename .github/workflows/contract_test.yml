@@ -39,13 +39,13 @@ jobs:
         uses: foundry-rs/foundry-toolchain@50d5a8956f2e319df19e6b57539d7e2acb9f8c1e # v1.5.0
 
       - name: Show Forge version
-        run: forge --version
+        run: cd contract && forge --version
 
       - name: Run Forge fmt
-        run: forge fmt --check
+        run: cd contract && forge fmt --check
 
       - name: Run Forge build
-        run: forge build --sizes
+        run: cd contract && forge build --sizes
 
       - name: Run Forge tests
-        run: forge test -vvv
+        run: cd contract && forge test -vvv
