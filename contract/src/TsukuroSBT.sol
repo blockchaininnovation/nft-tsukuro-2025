@@ -10,6 +10,14 @@ import {IERC5192} from "./IERC5192.sol";
 contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     using Strings for uint256;
 
+    // ===== Enums =====
+    enum Team {
+        TEAM_A, // Team 0 - no serial number
+        TEAM_D, // Team 1 - no serial number
+        TEAM_B, // Team B (2) - with serial number
+        TEAM_C // Team C (3) - with serial number
+    }
+
     // ===== Constants =====
     bytes4 public constant IID_IERC5192 = 0xb45a3c0e;
 
@@ -52,13 +60,15 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         return tokenId % TEAM_ID_MULTIPLIER;
     }
 
-    function _generateTokenId(uint256 teamId) internal returns (uint256) {
-        if (teamId == 2 || teamId == 3) {
+    function _generateTokenId(Team team) internal returns (uint256) {
+        uint256 teamId = uint256(team);
+
+        if (team == Team.TEAM_B || team == Team.TEAM_C) {
             // Teams B and C get serial numbers
             _nextSerialNumber[teamId]++;
             return teamId * TEAM_ID_MULTIPLIER + _nextSerialNumber[teamId];
         } else {
-            // Teams 0 and 1 don't have serial numbers
+            // Teams A and D don't have serial numbers
             return teamId * TEAM_ID_MULTIPLIER;
         }
     }
@@ -76,7 +86,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     // ===== Soulbound Logic =====
     function mintLocked(
         address to,
-        uint256 teamId,
+        Team team,
         uint256 amount,
         bytes memory data
     ) external {
@@ -84,7 +94,8 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
             require(to == msg.sender, "SBT: only owner can set recipient");
         }
         require(amount == 1, "SBT: amount must be 1");
-        require(teamId <= 3, "SBT: invalid team ID");
+
+        uint256 teamId = uint256(team);
 
         // Check duplicate mint per team
         bytes32 key = keccak256(abi.encodePacked(to, teamId));
@@ -92,7 +103,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         _hasMintedForTeam[key] = true;
 
         // Generate token ID
-        uint256 tokenId = _generateTokenId(teamId);
+        uint256 tokenId = _generateTokenId(team);
 
         _mint(to, tokenId, amount, data);
 
@@ -102,13 +113,14 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
 
     function mintLockedWithURI(
         address to,
-        uint256 teamId,
+        Team team,
         uint256 amount,
         bytes memory data,
         string memory tokenURI_
     ) external onlyOwner {
         require(amount == 1, "SBT: amount must be 1");
-        require(teamId <= 3, "SBT: invalid team ID");
+
+        uint256 teamId = uint256(team);
 
         // Check duplicate mint per team
         bytes32 key = keccak256(abi.encodePacked(to, teamId));
@@ -116,7 +128,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         _hasMintedForTeam[key] = true;
 
         // Generate token ID
-        uint256 tokenId = _generateTokenId(teamId);
+        uint256 tokenId = _generateTokenId(team);
 
         // Set token URI
         _tokenURIs[tokenId] = tokenURI_;
@@ -144,11 +156,12 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
         }
 
         uint256 teamId = getTeamId(tokenId);
+        Team team = Team(teamId);
         uint256 serialNumber = getSerialNumber(tokenId);
 
         if (isRevealed()) {
             // After reveal
-            if (teamId == 2) {
+            if (team == Team.TEAM_B) {
                 // Team B only: Include variant number in filename
                 uint256 variant = _getTeam2Variant(tokenId);
                 return
@@ -163,7 +176,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
                         )
                     );
             } else {
-                // Teams 0, 1, 3: Standard filename
+                // Teams A, C, D: Standard filename
                 return
                     string(
                         abi.encodePacked(
@@ -205,16 +218,16 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     }
 
     // ===== View Functions =====
-    function getNextSerialNumber(
-        uint256 teamId
-    ) external view returns (uint256) {
+    function getNextSerialNumber(Team team) external view returns (uint256) {
+        uint256 teamId = uint256(team);
         return _nextSerialNumber[teamId] + 1;
     }
 
     function hasMintedForTeam(
         address account,
-        uint256 teamId
+        Team team
     ) external view returns (bool) {
+        uint256 teamId = uint256(team);
         bytes32 key = keccak256(abi.encodePacked(account, teamId));
         return _hasMintedForTeam[key];
     }
