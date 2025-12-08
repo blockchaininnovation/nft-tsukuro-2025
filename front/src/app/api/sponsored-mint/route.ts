@@ -6,7 +6,7 @@ import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 import { NFT_ABI } from "@/contracts/nft-abi";
 
 // Team metadata configuration
-const TEAM_METADATA = {
+const _TEAM_METADATA = {
   0: {
     name: "Tsukuro SBT - Team A",
     description: "Tsukuro 2025 参加記念SBT - Team A",

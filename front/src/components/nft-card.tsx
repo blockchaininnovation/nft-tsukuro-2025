@@ -46,7 +46,6 @@ export function NFTCard({
         return CONTRACT_ADDRESSES.polygon;
       case polygonAmoy.id:
         return CONTRACT_ADDRESSES.polygonAmoy;
-      case anvil.id:
       default:
         return CONTRACT_ADDRESSES.anvil;
     }

@@ -29,7 +29,9 @@ export default function VenueLoginPage() {
         setError(data.error || "Login failed");
       }
     } catch (err) {
-      setError("An error occurred");
+      setError(
+        "An error occurred" + (err instanceof Error ? `: ${err.message}` : ""),
+      );
     } finally {
       setIsLoading(false);
     }
