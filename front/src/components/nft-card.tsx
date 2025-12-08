@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { useConnection, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
-import { NFT_ABI } from "@/contracts/nft-abi";
-import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
-import { anvil, polygon, polygonAmoy } from "wagmi/chains";
+import { useEffect, useState } from "react";
 import { isAddress } from "viem";
-import { useEffect } from "react";
+import {
+  useConnection,
+  useReadContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
+import { anvil, polygon, polygonAmoy } from "wagmi/chains";
+import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
+import { NFT_ABI } from "@/contracts/nft-abi";
 
 interface NFTCardProps {
   id: number;
@@ -19,7 +23,13 @@ interface NFTCardProps {
 
 import { SuccessDialog } from "./success-dialog";
 
-export function NFTCard({ id, title, description, image, isVenueMode }: NFTCardProps) {
+export function NFTCard({
+  id,
+  title,
+  description,
+  image,
+  isVenueMode,
+}: NFTCardProps) {
   const { address, isConnected, chain } = useConnection();
   const [isSponsoredMinting, setIsSponsoredMinting] = useState(false);
   const [sponsoredError, setSponsoredError] = useState<string | null>(null);
@@ -56,10 +66,13 @@ export function NFTCard({ id, title, description, image, isVenueMode }: NFTCardP
     address: contractAddress,
     abi: NFT_ABI,
     functionName: "balanceOf",
-    args: targetAddressForBalance && isAddress(targetAddressForBalance) ? [targetAddressForBalance, BigInt(id)] : undefined,
+    args:
+      targetAddressForBalance && isAddress(targetAddressForBalance)
+        ? [targetAddressForBalance, BigInt(id)]
+        : undefined,
     query: {
       enabled: !!targetAddressForBalance && isAddress(targetAddressForBalance),
-    }
+    },
   });
 
   useEffect(() => {
@@ -190,14 +203,24 @@ export function NFTCard({ id, title, description, image, isVenueMode }: NFTCardP
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded transition-colors"
           >
             {isVenueMode ? (
-              isSponsoredMinting ? "ミント中..." : "Mint (Venue Mode)"
+              isSponsoredMinting ? (
+                "ミント中..."
+              ) : (
+                "Mint (Venue Mode)"
+              )
             ) : (
               <>
                 {!isConnected && "ウォレットを接続してください"}
-                {isConnected && isSponsoredMinting && "スポンサードミント確認中..."}
+                {isConnected &&
+                  isSponsoredMinting &&
+                  "スポンサードミント確認中..."}
                 {isConnected && isPending && "署名待ち..."}
                 {isConnected && isConfirming && "トランザクション確認中..."}
-                {isConnected && !isPending && !isConfirming && !isSponsoredMinting && "Mint"}
+                {isConnected &&
+                  !isPending &&
+                  !isConfirming &&
+                  !isSponsoredMinting &&
+                  "Mint"}
               </>
             )}
           </button>
@@ -208,12 +231,17 @@ export function NFTCard({ id, title, description, image, isVenueMode }: NFTCardP
           )}
           {error && (
             <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-              エラー: {error.message.includes("User denied") ? "キャンセルされました" : error.message}
+              エラー:{" "}
+              {error.message.includes("User denied")
+                ? "キャンセルされました"
+                : error.message}
             </p>
           )}
           {sponsoredError && (
             <p className="mt-2 text-xs text-yellow-600 dark:text-yellow-400">
-              {isVenueMode ? sponsoredError : `${sponsoredError} - 通常のミントにフォールバック`}
+              {isVenueMode
+                ? sponsoredError
+                : `${sponsoredError} - 通常のミントにフォールバック`}
             </p>
           )}
         </div>

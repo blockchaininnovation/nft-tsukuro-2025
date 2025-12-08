@@ -1,7 +1,7 @@
+import { cookies } from "next/headers";
 import { Header } from "@/components/header";
 import { NFTCard } from "@/components/nft-card";
 import { NFT_METADATA } from "@/contracts/addresses";
-import { cookies } from "next/headers";
 
 export default async function Home() {
   const cookieStore = await cookies();

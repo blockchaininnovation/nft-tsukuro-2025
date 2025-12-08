@@ -1,7 +1,13 @@
 "use client";
 
-import { useConnection, useConnect, useDisconnect, useSwitchChain, useConnectors } from "wagmi";
 import { useEffect } from "react";
+import {
+  useConnect,
+  useConnection,
+  useConnectors,
+  useDisconnect,
+  useSwitchChain,
+} from "wagmi";
 import { config } from "@/lib/wagmi-config";
 
 export function WalletConnectButton() {
