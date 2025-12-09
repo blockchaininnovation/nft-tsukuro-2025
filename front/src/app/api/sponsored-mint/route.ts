@@ -1,25 +1,33 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createWalletClient, http, type Address } from "viem";
+import { type Address, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { polygon, polygonAmoy, foundry } from "viem/chains";
-import { NFT_ABI } from "@/contracts/nft-abi";
+import { foundry, polygon, polygonAmoy } from "viem/chains";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
+import { NFT_ABI } from "@/contracts/nft-abi";
 
-// Helper function to get client IP
-function getClientIp(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  const realIp = request.headers.get("x-real-ip");
-
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
-  }
-
-  if (realIp) {
-    return realIp;
-  }
-
-  return "unknown";
-}
+// Team metadata configuration
+const _TEAM_METADATA = {
+  0: {
+    name: "Tsukuro SBT - Team A",
+    description: "Tsukuro 2025 参加記念SBT - Team A",
+    hasSerial: false,
+  },
+  1: {
+    name: "Tsukuro SBT - Team B",
+    description: "Tsukuro 2025 参加記念SBT - Team B",
+    hasSerial: true,
+  },
+  2: {
+    name: "Tsukuro SBT - Team C",
+    description: "Tsukuro 2025 参加記念SBT - Team C",
+    hasSerial: true,
+  },
+  3: {
+    name: "Tsukuro SBT - Team D",
+    description: "Tsukuro 2025 参加記念SBT - Team D",
+    hasSerial: false,
+  },
+} as const;
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,11 +37,19 @@ export async function POST(request: NextRequest) {
     if (!to || tokenType === undefined) {
       return NextResponse.json(
         { success: false, error: "Missing required parameters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Check IP address
+    const teamId = Number(tokenType);
+    if (teamId < 0 || teamId > 3) {
+      return NextResponse.json(
+        { success: false, error: "Invalid team ID (must be 0-3)" },
+        { status: 400 },
+      );
+    }
+
+    // Check venue mode
     const venueSession = request.cookies.get("venue_session");
     const isVenueMode = venueSession?.value === "true";
 
@@ -43,7 +59,7 @@ export async function POST(request: NextRequest) {
           success: false,
           error: "Venue mode is not enabled",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -54,33 +70,36 @@ export async function POST(request: NextRequest) {
       console.error("SPONSOR_WALLET_PRIVATE_KEY not set");
       return NextResponse.json(
         { success: false, error: "Server configuration error" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    // Determine network (default to Anvil for local development)
+    // Determine network
     const useTestnet = process.env.USE_TESTNET === "true";
-    const useAnvil = process.env.USE_ANVIL !== "false"; // Default to Anvil
-    const chain = useAnvil ? foundry : (useTestnet ? polygonAmoy : polygon);
+    const useAnvil = process.env.USE_ANVIL !== "false";
+    const chain = useAnvil ? foundry : useTestnet ? polygonAmoy : polygon;
     const contractAddress = useAnvil
       ? CONTRACT_ADDRESSES.anvil
-      : (useTestnet ? CONTRACT_ADDRESSES.polygonAmoy : CONTRACT_ADDRESSES.polygon);
+      : useTestnet
+        ? CONTRACT_ADDRESSES.polygonAmoy
+        : CONTRACT_ADDRESSES.polygon;
 
     // Create wallet client
     const account = privateKeyToAccount(privateKey as `0x${string}`);
     const rpcUrl = useAnvil ? process.env.NEXT_PUBLIC_ANVIL_RPC_URL : undefined;
-    const client = createWalletClient({
+
+    const walletClient = createWalletClient({
       account,
       chain,
       transport: http(rpcUrl),
     });
 
-    // Execute mint transaction
-    const hash = await client.writeContract({
+    // Mint using base URI (metadata hosted on GitHub Pages)
+    const hash = await walletClient.writeContract({
       address: contractAddress,
       abi: NFT_ABI,
       functionName: "mintLocked",
-      args: [to as Address, BigInt(tokenType), BigInt(1), "0x"],
+      args: [to as Address, BigInt(teamId), BigInt(1), "0x"],
     });
 
     return NextResponse.json({
@@ -95,7 +114,7 @@ export async function POST(request: NextRequest) {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

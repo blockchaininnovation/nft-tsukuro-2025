@@ -1,5 +1,4 @@
-import { abi } from "./abi/SoulboundToken.json"
+import { abi } from "./abi/TsukuroSBT.json";
 
-// NFT Contract ABI
-// TODO: Replace this with actual ABI after contract deployment
-export const NFT_ABI = abi
+// NFT Contract ABI (TsukuroSBT with Reveal + Serial Number support)
+export const NFT_ABI = abi;
