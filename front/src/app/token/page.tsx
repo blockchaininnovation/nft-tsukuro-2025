@@ -60,17 +60,18 @@ function TokenContent() {
       ctx.drawImage(img, 0, 0, width, height);
 
       // Render the 3-digit code with a subtle shadow for visibility
-      const fontSize = Math.floor(width * 0.18);
+      const fontSize = Math.floor(width * 0.07);
       ctx.font = `${fontSize}px "Geist", "Inter", system-ui, sans-serif`;
-      ctx.fillStyle = "#ffffff";
-      const padding = Math.max(width, height) * 0.05;
-      ctx.textAlign = "right";
-      ctx.textBaseline = "bottom";
+      ctx.fillStyle = "#d1d5db"; // gray-300
+      const xPos = width * 0.65; // near the "No." label on the base image
+      const yPos = height * 0.85;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
       ctx.shadowColor = "rgba(0, 0, 0, 0.55)";
       ctx.shadowBlur = Math.max(8, Math.floor(fontSize / 10));
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = Math.max(4, Math.floor(fontSize / 30));
-      ctx.fillText(code, width - padding, height - padding);
+      ctx.fillText(code, xPos, yPos);
       ctx.shadowColor = "transparent";
     };
 
