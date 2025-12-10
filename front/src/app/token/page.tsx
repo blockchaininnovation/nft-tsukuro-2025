@@ -14,12 +14,20 @@ export default function TokenPage() {
   const searchParams = useSearchParams();
   const team = (searchParams.get("team") ?? DEFAULT_TEAM).toLowerCase();
   const code = useMemo(
-    () => formatCode(searchParams.get("id")),
+    () =>
+      formatCode(
+          searchParams.get("id"),
+      ),
     [searchParams],
   );
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -63,6 +71,14 @@ export default function TokenPage() {
       img.onerror = null;
     };
   }, [team, code]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-white px-4 py-8 text-gray-900 dark:bg-black dark:text-gray-50">
+        <div className="mx-auto w-full max-w-5xl animate-pulse rounded-2xl border border-gray-200 bg-gray-100 p-8 dark:border-gray-800 dark:bg-gray-950" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white px-4 py-8 text-gray-900 dark:bg-black dark:text-gray-50">
