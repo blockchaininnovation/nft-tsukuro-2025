@@ -14,10 +14,7 @@ export default function TokenPage() {
   const searchParams = useSearchParams();
   const team = (searchParams.get("team") ?? DEFAULT_TEAM).toLowerCase();
   const code = useMemo(
-    () =>
-      formatCode(
-          searchParams.get("id"),
-      ),
+    () => formatCode(searchParams.get("id")),
     [searchParams],
   );
 
@@ -90,7 +87,7 @@ export default function TokenPage() {
           <h1 className="text-3xl font-bold">Token Canvas</h1>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
             クエリパラメーターで指定した背景と3桁コードをCanvas上に描画します。
-            `?team=c&code=123` のように指定してください。
+            `?team=c&id=123` のように指定してください。
           </p>
         </div>
 
