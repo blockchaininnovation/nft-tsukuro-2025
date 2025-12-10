@@ -14,10 +14,7 @@ export default function TokenPage() {
   const searchParams = useSearchParams();
   const team = (searchParams.get("team") ?? DEFAULT_TEAM).toLowerCase();
   const code = useMemo(
-    () =>
-      formatCode(
-          searchParams.get("id")
-      ),
+    () => formatCode(searchParams.get("id")),
     [searchParams],
   );
 
