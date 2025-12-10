@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 
 const DEFAULT_TEAM = "c";
 
@@ -11,6 +11,14 @@ const formatCode = (raw: string | null) => {
 };
 
 export default function TokenPage() {
+  return (
+    <Suspense fallback={<TokenSkeleton />}>
+      <TokenContent />
+    </Suspense>
+  );
+}
+
+function TokenContent() {
   const searchParams = useSearchParams();
   const team = (searchParams.get("team") ?? DEFAULT_TEAM).toLowerCase();
   const code = useMemo(
@@ -117,6 +125,14 @@ export default function TokenPage() {
           />
         </div>
       </div>
+    </div>
+  );
+}
+
+function TokenSkeleton() {
+  return (
+    <div className="min-h-screen bg-white px-4 py-8 text-gray-900 dark:bg-black dark:text-gray-50">
+      <div className="mx-auto w-full max-w-5xl animate-pulse rounded-2xl border border-gray-200 bg-gray-100 p-8 dark:border-gray-800 dark:bg-gray-950" />
     </div>
   );
 }
