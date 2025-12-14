@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { isAddress } from "viem";
 import {
   useConnection,
@@ -12,7 +13,6 @@ import {
 import { polygon, polygonAmoy } from "wagmi/chains";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 import { NFT_ABI } from "@/contracts/nft-abi";
-import { toast } from "sonner";
 
 interface NFTCardProps {
   id: number;
@@ -22,9 +22,9 @@ interface NFTCardProps {
   isVenueMode?: boolean;
 }
 
-import { SuccessDialog } from "./success-dialog";
-import { QrScannerModal, type QrScanError } from "./qr-scanner-modal";
 import { ErrorDialog } from "./error-dialog";
+import { type QrScanError, QrScannerModal } from "./qr-scanner-modal";
+import { SuccessDialog } from "./success-dialog";
 
 export function NFTCard({
   id,
@@ -104,7 +104,8 @@ export function NFTCard({
         title: "カメラアクセスが拒否されました",
         message:
           "QRコードをスキャンするにはカメラへのアクセスを許可してください。",
-        details: "ブラウザの設定でこのサイトのカメラアクセスを許可してください。",
+        details:
+          "ブラウザの設定でこのサイトのカメラアクセスを許可してください。",
       });
       setShowErrorDialog(true);
     } else {
@@ -242,6 +243,7 @@ export function NFTCard({
                     fill="none"
                     stroke="currentColor"
                   >
+                    <title>QRコードスキャナー</title>
                     <rect x="3" y="3" width="7" height="7" strokeWidth="2" />
                     <rect x="14" y="3" width="7" height="7" strokeWidth="2" />
                     <rect x="3" y="14" width="7" height="7" strokeWidth="2" />

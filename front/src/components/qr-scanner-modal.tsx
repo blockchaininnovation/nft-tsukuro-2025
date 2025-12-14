@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
+import { useEffect, useState } from "react";
 import { isAddress } from "viem";
 
 export type QrScanError = {
@@ -150,6 +150,7 @@ export function QrScannerModal({
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
+            <title>閉じる</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
