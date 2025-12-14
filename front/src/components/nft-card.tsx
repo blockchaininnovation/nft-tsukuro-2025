@@ -268,7 +268,7 @@ export function NFTCard({
               isSponsoredMinting ? (
                 "ミント中..."
               ) : (
-                "Mint (Venue Mode)"
+                "Mint"
               )
             ) : (
               <>
