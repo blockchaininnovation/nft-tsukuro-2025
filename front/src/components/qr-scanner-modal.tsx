@@ -38,6 +38,7 @@ export function QrScannerModal({
 
     const qrCodeRegionId = "qr-reader";
     const html5QrCode = new Html5Qrcode(qrCodeRegionId);
+    let isScanning = false;
 
     const config = {
       fps: 10,
@@ -48,15 +49,21 @@ export function QrScannerModal({
     const qrCodeSuccessCallback = (decodedText: string) => {
       const address = decodedText.trim();
       if (isAddress(address)) {
-        html5QrCode
-          .stop()
-          .then(() => {
-            onScanSuccess(address);
-          })
-          .catch(() => {
-            // Ignore cleanup errors
-            onScanSuccess(address);
-          });
+        // スキャン成功時にカメラを停止
+        if (isScanning) {
+          isScanning = false;
+          html5QrCode
+            .stop()
+            .then(() => {
+              onScanSuccess(address);
+            })
+            .catch(() => {
+              // カメラ停止エラーは無視して、成功コールバックは実行
+              onScanSuccess(address);
+            });
+        } else {
+          onScanSuccess(address);
+        }
       } else {
         onError({
           type: "invalid_address",
@@ -67,6 +74,9 @@ export function QrScannerModal({
 
     html5QrCode
       .start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+      .then(() => {
+        isScanning = true;
+      })
       .catch((err) => {
         if (err.name === "NotAllowedError") {
           onError({
@@ -82,11 +92,13 @@ export function QrScannerModal({
       });
 
     return () => {
-      html5QrCode
-        .stop()
-        .catch(() => {
-          // Ignore cleanup errors
+      // クリーンアップ時、まだスキャン中の場合のみカメラを停止
+      if (isScanning) {
+        isScanning = false;
+        html5QrCode.stop().catch(() => {
+          // クリーンアップエラーは無視
         });
+      }
     };
   }, [isOpen, onScanSuccess, onError]);
 
