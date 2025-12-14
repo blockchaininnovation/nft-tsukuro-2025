@@ -12,6 +12,7 @@ import {
 import { polygon, polygonAmoy } from "wagmi/chains";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 import { NFT_ABI } from "@/contracts/nft-abi";
+import { toast } from "sonner";
 
 interface NFTCardProps {
   id: number;
@@ -22,6 +23,8 @@ interface NFTCardProps {
 }
 
 import { SuccessDialog } from "./success-dialog";
+import { QrScannerModal, type QrScanError } from "./qr-scanner-modal";
+import { ErrorDialog } from "./error-dialog";
 
 export function NFTCard({
   id,
@@ -36,6 +39,13 @@ export function NFTCard({
   const [manualAddress, setManualAddress] = useState("");
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [successTxHash, setSuccessTxHash] = useState("");
+  const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorDialogContent, setErrorDialogContent] = useState({
+    title: "",
+    message: "",
+    details: "",
+  });
 
   // Select contract address based on current network
   const getContractAddress = () => {
@@ -79,6 +89,28 @@ export function NFTCard({
       refetchBalance();
     }
   }, [isSuccess, showSuccessDialog, refetchBalance]);
+
+  const handleQrScanSuccess = (address: string) => {
+    setManualAddress(address);
+    setIsQrScannerOpen(false);
+    toast.success("ウォレットアドレスを読み取りました");
+  };
+
+  const handleQrScanError = (error: QrScanError) => {
+    setIsQrScannerOpen(false);
+
+    if (error.type === "camera_permission") {
+      setErrorDialogContent({
+        title: "カメラアクセスが拒否されました",
+        message:
+          "QRコードをスキャンするにはカメラへのアクセスを許可してください。",
+        details: "ブラウザの設定でこのサイトのカメラアクセスを許可してください。",
+      });
+      setShowErrorDialog(true);
+    } else {
+      toast.error(error.message);
+    }
+  };
 
   const handleMint = async () => {
     const targetAddress = isVenueMode ? manualAddress : address;
@@ -155,6 +187,17 @@ export function NFTCard({
         onClose={() => setShowSuccessDialog(false)}
         txHash={successTxHash}
       />
+      <ErrorDialog
+        isOpen={showErrorDialog}
+        onClose={() => setShowErrorDialog(false)}
+        {...errorDialogContent}
+      />
+      <QrScannerModal
+        isOpen={isQrScannerOpen}
+        onClose={() => setIsQrScannerOpen(false)}
+        onScanSuccess={handleQrScanSuccess}
+        onError={handleQrScanError}
+      />
       <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
         <div className="relative w-full aspect-square bg-gray-100 dark:bg-gray-900">
           <Image
@@ -179,13 +222,33 @@ export function NFTCard({
 
           {isVenueMode && (
             <div className="mb-4">
-              <input
-                type="text"
-                value={manualAddress}
-                onChange={(e) => setManualAddress(e.target.value)}
-                placeholder="0x..."
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={manualAddress}
+                  onChange={(e) => setManualAddress(e.target.value)}
+                  placeholder="0x..."
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsQrScannerOpen(true)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors"
+                  aria-label="QRコードをスキャン"
+                >
+                  <svg
+                    className="w-5 h-5 text-gray-600 dark:text-gray-300"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <rect x="3" y="3" width="7" height="7" strokeWidth="2" />
+                    <rect x="14" y="3" width="7" height="7" strokeWidth="2" />
+                    <rect x="3" y="14" width="7" height="7" strokeWidth="2" />
+                    <path d="M14 14h7v7h-7z" strokeWidth="2" />
+                  </svg>
+                </button>
+              </div>
             </div>
           )}
 
