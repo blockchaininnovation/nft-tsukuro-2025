@@ -73,7 +73,15 @@ export function QrScannerModal({
     };
 
     html5QrCode
-      .start({ facingMode: "environment" }, config, qrCodeSuccessCallback)
+      .start(
+        { facingMode: "environment" },
+        config,
+        qrCodeSuccessCallback,
+        () => {
+          // スキャンエラー（QRコードが見つからない等）は無視
+          // 連続スキャン中は常に呼ばれるため、ログは出さない
+        },
+      )
       .then(() => {
         isScanning = true;
       })
