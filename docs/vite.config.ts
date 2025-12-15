@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/nft-tsukuro-2025/viewer/',
+  base: '/nft-tsukuro-2025/',
   build: {
     outDir: './dist',
     emptyOutDir: true,
