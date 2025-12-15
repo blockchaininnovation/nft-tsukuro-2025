@@ -1,0 +1,20 @@
+{
+  "name": "Tsukuro SBT - Team A (Unrevealed)",
+  "description": "This is a Soulbound Token (SBT) for Team A participants in the NFT Tsukuro 2025 event. This token will be revealed on January 1, 2026.",
+  "image": "https://github.com/blockchaininnovation/nft-tsukuro-2025/blob/main/docs/public/metadata/unrevealed/0a5039bdc382ac2a.png?raw=true",
+  "animation_url": "https://blockchaininnovation.github.io/nft-tsukuro-2025/?team=0",
+  "attributes": [
+    {
+      "trait_type": "ACADEMIC YEAR",
+      "value": "2025"
+    },
+    {
+      "trait_type": "Team",
+      "value": "A"
+    },
+    {
+      "trait_type": "MIZUHIKI",
+      "value": "Ume Knot"
+    }
+  ]
+}
