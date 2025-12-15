@@ -1,0 +1,64 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+	"name": "blockcain-dev",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:24-trixie",
+	"runArgs": [
+		"--cap-add=SYS_PTRACE",
+		"--security-opt",
+		"seccomp=unconfined"
+	],
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/python:1": {}
+	},
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"editor.formatOnSave": true,
+				"[typescriptreact]": {
+					"editor.defaultFormatter": "biomejs.biome"
+				},
+				"[solidity]": {
+					"editor.defaultFormatter": "JuanBlanco.solidity"
+				},
+				"typescript.tsdk": "/opt/nodejs/lib/node_modules/typescript/lib",
+				"typescript.enablePromptUseWorkspaceTsdk": true,
+				"typescript.suggest.autoImports": true,
+				"typescript.suggest.completeFunctionCalls": true,
+				"typescript.suggest.autoImportsSuggestions.enabled": true,
+				"typescript.suggest.includeCompletionsForModuleExports": true,
+				"typescript.suggest.includeCompletionsForObjectLiteralMethods": true,
+				"typescript.suggest.includeCompletionsForImportStatements": true
+			},
+			"extensions": [
+				"GitHub.copilot",
+				"GitHub.copilot-chat",
+				"saoudrizwan.claude-dev",
+				"biomejs.biome",
+				"mutantdino.resourcemonitor",
+				"JuanBlanco.solidity",
+				"MS-vsliveshare.vsliveshare",
+				"trailofbits.slither-vscode",
+				"tintinweb.solidity-visual-auditor",
+				"bradlc.vscode-tailwindcss",
+				"dsznajder.es7-react-js-snippets",
+				"christian-kohler.path-intellisense",
+				"Anthropic.claude-code"
+			]
+		}
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		30303,
+		8545
+	],
+	"postCreateCommand": [
+		"/bin/bash",
+		"-i",
+		"-c",
+		"chmod u+x ./.devcontainer/setup.sh && ./.devcontainer/setup.sh && source /home/node/.bashrc && foundryup && pnpm config set store-dir ${HOME}/.pnpm-store && cd /workspaces/nft-tsukuro-2025/front && pnpm install"
+	]
+}
