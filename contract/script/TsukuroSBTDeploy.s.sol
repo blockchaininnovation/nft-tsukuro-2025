@@ -17,8 +17,10 @@ contract TsukuroSBTDeploy is Script {
         tsukuroSBT = new TsukuroSBT(deployer);
 
         // Set metadata URIs
-        string memory unrevealedURI = "https://raw.githubusercontent.com/blockchaininnovation/nft-tsukuro-2025/refs/heads/main/assets/unrevealed/";
-        string memory revealedURI = "https://raw.githubusercontent.com/blockchaininnovation/nft-tsukuro-2025/refs/heads/main/assets/revealed/";
+        string memory unrevealedURI =
+            "https://raw.githubusercontent.com/blockchaininnovation/nft-tsukuro-2025/refs/heads/main/assets/unrevealed/";
+        string memory revealedURI =
+            "https://raw.githubusercontent.com/blockchaininnovation/nft-tsukuro-2025/refs/heads/main/assets/revealed/";
 
         tsukuroSBT.setUnrevealedBaseURI(unrevealedURI);
         tsukuroSBT.setRevealedBaseURI(revealedURI);
