@@ -1,29 +1,45 @@
 "use client";
 
-import { useEffect } from "react";
-import {
-  useConnect,
-  useConnection,
-  useConnectors,
-  useDisconnect,
-  useSwitchChain,
-} from "wagmi";
+import { useConnect, useConnection, useConnectors, useDisconnect } from "wagmi";
 import { config } from "@/lib/wagmi-config";
 
 export function WalletConnectButton() {
-  const { address, isConnected, chain } = useConnection();
+  const { address, isConnected } = useConnection();
   const { connect } = useConnect();
   const connectors = useConnectors();
   const { disconnect } = useDisconnect();
-  const { switchChain } = useSwitchChain();
   const { chains } = config;
-  const defaultChain = chains[0];
 
-  useEffect(() => {
-    if (isConnected && address && chain?.id !== defaultChain.id) {
-      switchChain({ chainId: defaultChain.id });
+  const handleConnect = async () => {
+    const connector = connectors[0];
+    if (!connector) return;
+
+    // Detect the current network from Metamask
+    if (typeof window !== "undefined" && window.ethereum) {
+      try {
+        const chainIdHex = await window.ethereum.request({
+          method: "eth_chainId",
+        });
+        const chainId = parseInt(chainIdHex as string, 16);
+
+        // Check if the detected chain is supported
+        const supportedChain = chains.find((c) => c.id === chainId);
+
+        if (supportedChain) {
+          // Connect with the user's selected chain
+          connect({ connector, chainId });
+        } else {
+          // Connect without specifying chainId (will use chains[0])
+          connect({ connector });
+        }
+      } catch (error) {
+        console.error("Failed to get chainId:", error);
+        connect({ connector });
+      }
+    } else {
+      connect({ connector });
     }
-  }, [isConnected, address, chain, defaultChain.id, switchChain]);
+  };
 
   if (isConnected && address) {
     return (
@@ -47,7 +63,7 @@ export function WalletConnectButton() {
   return (
     <button
       type="button"
-      onClick={() => connect({ connector })}
+      onClick={handleConnect}
       disabled={!connector}
       className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white rounded-lg transition-colors"
     >
