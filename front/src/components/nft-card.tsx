@@ -4,14 +4,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { isAddress } from "viem";
-import {
-  useConnection,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi";
-import { polygon, polygonAmoy } from "wagmi/chains";
-import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
+import { useReadContract } from "wagmi";
+import { useWallet } from "@/contexts/wallet-context";
 import { NFT_ABI } from "@/contracts/nft-abi";
 
 interface NFTCardProps {
@@ -19,24 +13,27 @@ interface NFTCardProps {
   title: string;
   description: string;
   image: string;
-  isVenueMode?: boolean;
 }
 
 import { ErrorDialog } from "./error-dialog";
 import { type QrScanError, QrScannerModal } from "./qr-scanner-modal";
 import { SuccessDialog } from "./success-dialog";
 
-export function NFTCard({
-  id,
-  title,
-  description,
-  image,
-  isVenueMode,
-}: NFTCardProps) {
-  const { address, isConnected, chain } = useConnection();
+export function NFTCard({ id, title, description, image }: NFTCardProps) {
+  const {
+    isVenueMode,
+    isConnected,
+    displayAddress,
+    contractAddress,
+    isAddressValid,
+    shortAddress,
+    manualAddress,
+    setManualAddress,
+    chain,
+  } = useWallet();
+
   const [isSponsoredMinting, setIsSponsoredMinting] = useState(false);
   const [sponsoredError, setSponsoredError] = useState<string | null>(null);
-  const [manualAddress, setManualAddress] = useState("");
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [successTxHash, setSuccessTxHash] = useState("");
   const [isQrScannerOpen, setIsQrScannerOpen] = useState(false);
@@ -47,48 +44,24 @@ export function NFTCard({
     details: "",
   });
 
-  // Select contract address based on current network
-  const getContractAddress = () => {
-    if (!chain) return CONTRACT_ADDRESSES.anvil; // Default to Anvil
-
-    switch (chain.id) {
-      case polygon.id:
-        return CONTRACT_ADDRESSES.polygon;
-      case polygonAmoy.id:
-        return CONTRACT_ADDRESSES.polygonAmoy;
-      default:
-        return CONTRACT_ADDRESSES.anvil;
-    }
-  };
-
-  const contractAddress = getContractAddress();
-
-  const { writeContract, data: hash, isPending, error } = useWriteContract();
-
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  });
-
-  const targetAddressForBalance = isVenueMode ? manualAddress : address;
-
   const { data: balance, refetch: refetchBalance } = useReadContract({
     address: contractAddress,
     abi: NFT_ABI,
     functionName: "balanceOf",
     args:
-      targetAddressForBalance && isAddress(targetAddressForBalance)
-        ? [targetAddressForBalance, BigInt(id)]
+      displayAddress && isAddress(displayAddress)
+        ? [displayAddress, BigInt(id)]
         : undefined,
     query: {
-      enabled: !!targetAddressForBalance && isAddress(targetAddressForBalance),
+      enabled: !!displayAddress && isAddress(displayAddress),
     },
   });
 
   useEffect(() => {
-    if (isSuccess || showSuccessDialog) {
+    if (showSuccessDialog) {
       refetchBalance();
     }
-  }, [isSuccess, showSuccessDialog, refetchBalance]);
+  }, [showSuccessDialog, refetchBalance]);
 
   const handleQrScanSuccess = (address: string) => {
     setManualAddress(address);
@@ -114,14 +87,12 @@ export function NFTCard({
   };
 
   const handleMint = async () => {
-    const targetAddress = isVenueMode ? manualAddress : address;
-
-    if (!isVenueMode && (!isConnected || !targetAddress)) {
+    if (!isVenueMode && (!isConnected || !displayAddress)) {
       alert("ウォレットを接続してください");
       return;
     }
 
-    if (isVenueMode && !isAddress(targetAddress || "")) {
+    if (isVenueMode && !isAddressValid) {
       alert("有効なアドレスを入力してください");
       return;
     }
@@ -135,8 +106,9 @@ export function NFTCard({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          to: targetAddress,
+          to: displayAddress,
           tokenType: id,
+          chainId: chain?.id,
         }),
       });
 
@@ -151,33 +123,11 @@ export function NFTCard({
       }
 
       // If sponsored mint fails
-      setSponsoredError(data.error || "スポンサードミントに失敗しました");
-
-      // In Venue Mode, we don't fall back to wallet minting
-      if (isVenueMode) {
-        alert(`エラー: ${data.error || "ミントに失敗しました"}`);
-        setIsSponsoredMinting(false);
-        return;
-      }
+      setSponsoredError(data.error || "ミントに失敗しました");
+      setIsSponsoredMinting(false);
     } catch (_err) {
-      setSponsoredError("スポンサードミントの確認に失敗しました");
-      if (isVenueMode) {
-        alert("エラーが発生しました");
-        setIsSponsoredMinting(false);
-        return;
-      }
-    }
-
-    setIsSponsoredMinting(false);
-
-    // Regular mint (user pays gas) - Only for non-Venue Mode
-    if (!isVenueMode && targetAddress) {
-      writeContract({
-        address: contractAddress,
-        abi: NFT_ABI,
-        functionName: "mintLocked",
-        args: [targetAddress, BigInt(id), BigInt(1), "0x"],
-      });
+      setSponsoredError("ミントに失敗しました");
+      setIsSponsoredMinting(false);
     }
   };
 
@@ -215,13 +165,13 @@ export function NFTCard({
             {description}
           </p>
 
-          {targetAddressForBalance && isAddress(targetAddressForBalance) && (
+          {displayAddress && isAddressValid && (
             <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
               所持数: {balance != null ? balance.toString() : "確認中..."}
             </p>
           )}
 
-          {isVenueMode && (
+          {isVenueMode ? (
             <div className="mb-4">
               <div className="relative">
                 <input
@@ -252,6 +202,13 @@ export function NFTCard({
                 </button>
               </div>
             </div>
+          ) : (
+            isConnected &&
+            shortAddress && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 font-mono">
+                {shortAddress}
+              </p>
+            )
           )}
 
           <button
@@ -259,53 +216,20 @@ export function NFTCard({
             onClick={handleMint}
             disabled={
               (!isVenueMode && !isConnected) ||
-              isPending ||
-              isConfirming ||
               isSponsoredMinting ||
               (isVenueMode && !manualAddress)
             }
             className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded transition-colors"
           >
-            {isVenueMode ? (
-              isSponsoredMinting ? (
-                "ミント中..."
-              ) : (
-                "Mint"
-              )
-            ) : (
-              <>
-                {!isConnected && "ウォレットを接続してください"}
-                {isConnected &&
-                  isSponsoredMinting &&
-                  "スポンサードミント確認中..."}
-                {isConnected && isPending && "署名待ち..."}
-                {isConnected && isConfirming && "トランザクション確認中..."}
-                {isConnected &&
-                  !isPending &&
-                  !isConfirming &&
-                  !isSponsoredMinting &&
-                  "Mint"}
-              </>
-            )}
+            {!isVenueMode && !isConnected
+              ? "ウォレットを接続してください"
+              : isSponsoredMinting
+                ? "ミント中..."
+                : "Mint"}
           </button>
-          {isSuccess && (
-            <p className="mt-2 text-sm text-green-600 dark:text-green-400">
-              ミント成功！
-            </p>
-          )}
-          {error && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-              エラー:{" "}
-              {error.message.includes("User denied")
-                ? "キャンセルされました"
-                : error.message}
-            </p>
-          )}
           {sponsoredError && (
-            <p className="mt-2 text-xs text-yellow-600 dark:text-yellow-400">
-              {isVenueMode
-                ? sponsoredError
-                : `${sponsoredError} - 通常のミントにフォールバック`}
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+              {sponsoredError}
             </p>
           )}
         </div>
