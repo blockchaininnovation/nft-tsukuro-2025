@@ -12,10 +12,10 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
 
     // ===== Enums =====
     enum Team {
-        TEAM_A, // Team 0 - no serial number
+        TEAM_A, // Team 0 - with serial number
         TEAM_B, // Team 1 - with serial number and variant
         TEAM_C, // Team 2 - with serial number
-        TEAM_D // Team 3 - no serial number
+        TEAM_D // Team 3 - with serial number
     }
 
     // ===== Constants =====
@@ -30,7 +30,7 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     // ===== State Variables =====
     mapping(uint256 => bool) private _locked;
 
-    // Serial number counter for each team (team B, C only)
+    // Serial number counter for each team (all teams)
     mapping(uint256 => uint256) private _nextSerialNumber;
 
     // Track if an address has minted for a specific team
@@ -66,14 +66,9 @@ contract TsukuroSBT is ERC1155, Ownable, IERC5192 {
     function _generateTokenId(Team team) internal returns (uint256) {
         uint256 teamId = uint256(team);
 
-        if (team == Team.TEAM_B || team == Team.TEAM_C) {
-            // Teams B and C get serial numbers
-            _nextSerialNumber[teamId]++;
-            return teamId * TEAM_ID_MULTIPLIER + _nextSerialNumber[teamId];
-        } else {
-            // Teams A and D don't have serial numbers
-            return teamId * TEAM_ID_MULTIPLIER;
-        }
+        // All teams get serial numbers
+        _nextSerialNumber[teamId]++;
+        return teamId * TEAM_ID_MULTIPLIER + _nextSerialNumber[teamId];
     }
 
     // ===== IERC5192 =====

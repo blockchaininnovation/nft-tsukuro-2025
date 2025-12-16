@@ -1,0 +1,20 @@
+{
+  "name": "和風ニャカモトコイン",
+  "description": "This is a Soulbound Token (SBT) for Team D participants in the NFT Tsukuro 2025 event. This token will be revealed on January 1, 2026.",
+  "image": "https://github.com/blockchaininnovation/nft-tsukuro-2025/blob/main/docs/public/metadata/unrevealed/01_2.webp?raw=true",
+  "animation_url": "https://blockchaininnovation.github.io/nft-tsukuro-2025/?team=3",
+  "attributes": [
+    {
+      "trait_type": "ACADEMIC YEAR",
+      "value": "2025"
+    },
+    {
+      "trait_type": "TEAM",
+      "value": "D"
+    },
+    {
+      "trait_type": "MIZUHIKI",
+      "value": "Butterfly knot"
+    }
+  ]
+}

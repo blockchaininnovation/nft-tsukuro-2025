@@ -62,14 +62,14 @@ contract TsukuroSBTTest is Test {
         assertTrue(tsukuroSBT.isRevealed());
     }
 
-    // ===== Mint Tests - Team 0 (No Serial) =====
+    // ===== Mint Tests - Team 0 (With Serial) =====
     function test_mintLocked_team0_noSerial() public {
         vm.prank(ownerAddr);
         tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_A, 1, "");
 
-        // Token ID should be 0 (team 0, no serial)
-        assertEq(tsukuroSBT.balanceOf(alice, 0), 1);
-        assertTrue(tsukuroSBT.locked(0));
+        // Token ID should be 1 (team 0, serial 1)
+        assertEq(tsukuroSBT.balanceOf(alice, 1), 1);
+        assertTrue(tsukuroSBT.locked(1));
     }
 
     function test_mintLocked_team1_withSerial() public {
@@ -140,10 +140,10 @@ contract TsukuroSBTTest is Test {
         tsukuroSBT.mintLocked(alice, TsukuroSBT.Team.TEAM_D, 1, "");
         vm.stopPrank();
 
-        assertEq(tsukuroSBT.balanceOf(alice, 0), 1); // Team A (0), no serial
+        assertEq(tsukuroSBT.balanceOf(alice, 1), 1); // Team A (0), serial 1
         assertEq(tsukuroSBT.balanceOf(alice, 10001), 1); // Team B (1), serial 1
         assertEq(tsukuroSBT.balanceOf(alice, 20001), 1); // Team C (2), serial 1
-        assertEq(tsukuroSBT.balanceOf(alice, 30000), 1); // Team D (3), no serial
+        assertEq(tsukuroSBT.balanceOf(alice, 30001), 1); // Team D (3), serial 1
     }
 
     function test_hasMintedForTeam() public {
@@ -213,8 +213,8 @@ contract TsukuroSBTTest is Test {
         vm.warp(1767193200 + 1);
 
         // After reveal, should return revealed URI
-        // Team D doesn't have serial number anymore!
-        assertEq(tsukuroSBT.uri(30000), "https://example.com/revealed/3/0.json");
+        // Team D now has serial number!
+        assertEq(tsukuroSBT.uri(30001), "https://example.com/revealed/3/1.json");
     }
 
     function test_uri_individualOverride() public {
@@ -259,7 +259,7 @@ contract TsukuroSBTTest is Test {
         vm.stopPrank();
 
         ids[0] = 20001; // Team C, serial 1
-        ids[1] = 30000; // Team D, no serial
+        ids[1] = 30001; // Team D, serial 1
         amounts[0] = 1;
         amounts[1] = 1;
 
@@ -378,11 +378,11 @@ contract TsukuroSBTTest is Test {
         // Warp to after reveal
         vm.warp(1767193200 + 1);
 
-        // Team A: no serial
-        assertEq(tsukuroSBT.uri(0), "https://example.com/revealed/0/0.json");
+        // Team A: has serial
+        assertEq(tsukuroSBT.uri(1), "https://example.com/revealed/0/1.json");
         // Team C: has serial
         assertEq(tsukuroSBT.uri(20001), "https://example.com/revealed/2/1.json");
-        // Team D: no serial anymore!
-        assertEq(tsukuroSBT.uri(30000), "https://example.com/revealed/3/0.json");
+        // Team D: has serial now!
+        assertEq(tsukuroSBT.uri(30001), "https://example.com/revealed/3/1.json");
     }
 }
