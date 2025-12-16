@@ -14,6 +14,7 @@
     "dev:anvil": "echo 'Start Anvil in a separate terminal with: npm run anvil:start' && npm run dev"
   },
   "dependencies": {
+    "@aws-sdk/client-ssm": "^3.952.0",
     "@tanstack/react-query": "^5.90.10",
     "aws-amplify": "^6.15.8",
     "html5-qrcode": "2.3.8",
