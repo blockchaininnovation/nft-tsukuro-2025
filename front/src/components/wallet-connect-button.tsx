@@ -10,11 +10,10 @@ import {
 import { config } from "@/lib/wagmi-config";
 
 export function WalletConnectButton() {
-  const { address, isConnected, chain } = useConnection();
+  const { address, isConnected } = useConnection();
   const { connect } = useConnect();
   const connectors = useConnectors();
   const { disconnect } = useDisconnect();
-  const { switchChain } = useSwitchChain();
   const { chains } = config;
 
   const handleConnect = async () => {
