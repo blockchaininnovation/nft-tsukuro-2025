@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useConnect,
-  useConnection,
-  useConnectors,
-  useDisconnect,
-  useSwitchChain,
-} from "wagmi";
+import { useConnect, useConnection, useConnectors, useDisconnect } from "wagmi";
 import { config } from "@/lib/wagmi-config";
 
 export function WalletConnectButton() {
