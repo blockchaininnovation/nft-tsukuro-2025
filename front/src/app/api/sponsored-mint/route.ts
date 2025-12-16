@@ -29,12 +29,38 @@ const _TEAM_METADATA = {
   },
 } as const;
 
+// Get chain config based on chainId from client
+const getChainConfig = (chainId: number) => {
+  switch (chainId) {
+    case polygon.id:
+      return {
+        chain: polygon,
+        contractAddress: CONTRACT_ADDRESSES.polygon,
+        rpcUrl: process.env.NEXT_PUBLIC_POLYGON_RPC_URL,
+      };
+    case polygonAmoy.id:
+      return {
+        chain: polygonAmoy,
+        contractAddress: CONTRACT_ADDRESSES.polygonAmoy,
+        rpcUrl: process.env.NEXT_PUBLIC_POLYGON_AMOY_RPC_URL,
+      };
+    case foundry.id:
+      return {
+        chain: foundry,
+        contractAddress: CONTRACT_ADDRESSES.anvil,
+        rpcUrl: process.env.NEXT_PUBLIC_ANVIL_RPC_URL,
+      };
+    default:
+      return null;
+  }
+};
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { to, tokenType } = body;
+    const { to, tokenType, chainId } = body;
 
-    if (!to || tokenType === undefined) {
+    if (!to || tokenType === undefined || !chainId) {
       return NextResponse.json(
         { success: false, error: "Missing required parameters" },
         { status: 400 },
@@ -45,6 +71,15 @@ export async function POST(request: NextRequest) {
     if (teamId < 0 || teamId > 3) {
       return NextResponse.json(
         { success: false, error: "Invalid team ID (must be 0-3)" },
+        { status: 400 },
+      );
+    }
+
+    // Get chain config based on client's chainId
+    const chainConfig = getChainConfig(chainId);
+    if (!chainConfig) {
+      return NextResponse.json(
+        { success: false, error: "Unsupported network" },
         { status: 400 },
       );
     }
@@ -60,29 +95,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Determine network
-    const useTestnet = process.env.USE_TESTNET === "true";
-    const useAnvil = process.env.USE_ANVIL !== "false";
-    const chain = useAnvil ? foundry : useTestnet ? polygonAmoy : polygon;
-    const contractAddress = useAnvil
-      ? CONTRACT_ADDRESSES.anvil
-      : useTestnet
-        ? CONTRACT_ADDRESSES.polygonAmoy
-        : CONTRACT_ADDRESSES.polygon;
+    // Ensure private key has 0x prefix
+    const formattedPrivateKey = privateKey.startsWith("0x")
+      ? privateKey
+      : `0x${privateKey}`;
 
     // Create wallet client
-    const account = privateKeyToAccount(privateKey as `0x${string}`);
-    const rpcUrl = useAnvil ? process.env.NEXT_PUBLIC_ANVIL_RPC_URL : undefined;
+    const account = privateKeyToAccount(formattedPrivateKey as `0x${string}`);
 
     const walletClient = createWalletClient({
       account,
-      chain,
-      transport: http(rpcUrl),
+      chain: chainConfig.chain,
+      transport: http(chainConfig.rpcUrl),
     });
 
     // Mint using base URI (metadata hosted on GitHub Pages)
     const hash = await walletClient.writeContract({
-      address: contractAddress,
+      address: chainConfig.contractAddress,
       abi: NFT_ABI,
       functionName: "mintLocked",
       args: [to as Address, BigInt(teamId), BigInt(1), "0x"],
