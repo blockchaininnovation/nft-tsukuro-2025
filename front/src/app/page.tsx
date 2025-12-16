@@ -1,11 +1,14 @@
-import { cookies } from "next/headers";
 import { Header } from "@/components/header";
 import { NFTCard } from "@/components/nft-card";
 import { NFT_METADATA } from "@/contracts/addresses";
 
-export default async function Home() {
-  const cookieStore = await cookies();
-  const isVenueMode = cookieStore.get("venue_session")?.value === "true";
+interface HomeProps {
+  searchParams: Promise<{ venue?: string }>;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const params = await searchParams;
+  const isVenueMode = params.venue === "true";
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
