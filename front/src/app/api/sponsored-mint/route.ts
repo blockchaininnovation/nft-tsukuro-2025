@@ -4,6 +4,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { foundry, polygon, polygonAmoy } from "viem/chains";
 import { CONTRACT_ADDRESSES } from "@/contracts/addresses";
 import { NFT_ABI } from "@/contracts/nft-abi";
+import { getSponsorWalletPrivateKey } from "@/lib/aws-ssm";
 
 // Team metadata configuration
 const _TEAM_METADATA = {
@@ -84,11 +85,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get sponsor wallet private key
-    const privateKey = process.env.SPONSOR_WALLET_PRIVATE_KEY;
-
-    if (!privateKey) {
-      console.error("SPONSOR_WALLET_PRIVATE_KEY not set");
+    // Get sponsor wallet private key from env or SSM Parameter Store
+    let privateKey: string;
+    try {
+      privateKey = await getSponsorWalletPrivateKey();
+    } catch (error) {
+      console.error("Failed to get sponsor wallet private key:", error);
       return NextResponse.json(
         { success: false, error: "Server configuration error" },
         { status: 500 },
