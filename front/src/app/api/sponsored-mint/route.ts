@@ -49,20 +49,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check venue mode
-    const venueSession = request.cookies.get("venue_session");
-    const isVenueMode = venueSession?.value === "true";
-
-    if (!isVenueMode) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Venue mode is not enabled",
-        },
-        { status: 403 },
-      );
-    }
-
     // Get sponsor wallet private key
     const privateKey = process.env.SPONSOR_WALLET_PRIVATE_KEY;
 
@@ -100,6 +86,7 @@ export async function POST(request: NextRequest) {
       abi: NFT_ABI,
       functionName: "mintLocked",
       args: [to as Address, BigInt(teamId), BigInt(1), "0x"],
+      gas: BigInt(200000),
     });
 
     return NextResponse.json({
