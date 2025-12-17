@@ -1,7 +1,7 @@
 {
-  "name": "Tsukuro SBT - Team A (Unrevealed)",
-  "description": "This is a Soulbound Token (SBT) for Team A participants in the NFT Tsukuro 2025 event. This token will be revealed on January 1, 2026.",
-  "image": "https://github.com/blockchaininnovation/nft-tsukuro-2025/blob/main/docs/public/metadata/unrevealed/0a5039bdc382ac2a.png?raw=true",
+  "name": "大願成就ツシマヤマネコ・GOLD (Unrevealed)",
+  "description": "一度結ぶと容易には解けない「梅結び」を採用。固い絆の象徴であり、改ざん困難なブロックチェーンの堅牢性と、講座を通じて結ばれた卒業生の揺るぎない結束を表現しています。運命好転や魔除けの意味を持つ、新春にふさわしい吉祥デザインです。",
+  "image": "https://blockchaininnovation.github.io/nft-tsukuro-2025/metadata/unrevealed/0a5039bdc382ac2a.png",
   "animation_url": "https://blockchaininnovation.github.io/nft-tsukuro-2025/?team=0",
   "attributes": [
     {
@@ -9,7 +9,7 @@
       "value": "2025"
     },
     {
-      "trait_type": "Team",
+      "trait_type": "TEAM",
       "value": "A"
     },
     {

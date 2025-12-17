@@ -1,0 +1,37 @@
+{
+  "name": "月下のニャカモト ～共創の調べ～ #000042",
+  "description": "元旦にお年玉として登場する架空のデジタルアセット「ニャカモト」のイメージは、卒業生が将来的にサトシ・ナカモトのように国際社会で認められ、その評価が月まで届くほど高まることを期待してデザインされました。\n\nこのNFTは柔らかい色彩や曲線をベースとしたデザインで、不協和から時間の経過とともに調和を形成する様子を表現しています。\n\n貨幣を基盤とする利己的な資本主義の弊害が指摘される昨今、和を結ぶことによって温かい人とのつながりを実現する。日本的な共生の思考は真の価値を提供するものであると考えます。",
+  "image": "https://blockchaininnovation.github.io/nft-tsukuro-2025/metadata/revealed/3/02.webp",
+  "animation_url": "https://blockchaininnovation.github.io/nft-tsukuro-2025/?team=3&serial=000042",
+  "attributes": [
+    {
+      "trait_type": "受講年度",
+      "value": "2025"
+    },
+    {
+      "trait_type": "チーム",
+      "value": "D"
+    },
+    {
+      "trait_type": "水引き",
+      "value": "蝶結び"
+    },
+    {
+      "trait_type": "猫",
+      "value": "月猫"
+    },
+    {
+      "trait_type": "色",
+      "value": "夢色"
+    },
+    {
+      "trait_type": "その他",
+      "value": "月、和風、猫、達成記念、東大ブロックチェーン公開講座、和紙、調和、共創、和の誘引"
+    },
+    {
+      "trait_type": "Serial Number",
+      "display_type": "number",
+      "value": 42
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "name": "大願成就ツシマヤマネコ・GOLD #000087",
+  "description": "大願成就を象徴する「ツシマヤマネコ」。日本固有の力強さを纏い、アカデミックな卒業ローブを翻して社会へ飛び出す姿は、私たち受講生の未来そのものです。高く掲げた両手は、ブロックチェーンがもたらす「経済的価値」と「人の和」の両方を呼び込みます。コインに刻まれた「522」は、2010年5月22日の「ビットコイン・ピザ・デー」へのオマージュ。机上の学びで終わらせず、実社会で価値を生み出す人材になるという願いを込めて。",
+  "image": "https://blockchaininnovation.github.io/nft-tsukuro-2025/metadata/revealed/0/6f74ea22efa59b15.png",
+  "animation_url": "https://blockchaininnovation.github.io/nft-tsukuro-2025/?team=0",
+  "attributes": [
+    {
+      "trait_type": "ACADEMIC YEAR",
+      "value": "2025"
+    },
+    {
+      "trait_type": "TEAM",
+      "value": "A"
+    },
+    {
+      "trait_type": "MIZUHIKI",
+      "value": "Ume Knot"
+    },
+    {
+      "trait_type": "CAT",
+      "value": "Tsushima Leopard Cat"
+    },
+    {
+      "trait_type": "HAT",
+      "value": "Mortarboard"
+    },
+    {
+      "trait_type": "CLOTH",
+      "value": "Graduation Gown"
+    },
+    {
+      "trait_type": "COIN",
+      "value": "Gold"
+    },
+    {
+      "trait_type": "AMOUNT",
+      "value": 522
+    },
+    {
+      "trait_type": "OTHER",
+      "value": "Beckoning with Both Paws"
+    },
+    {
+      "trait_type": "Serial Number",
+      "display_type": "number",
+      "value": 87
+    }
+  ]
+}
