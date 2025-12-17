@@ -165,12 +165,6 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
             {description}
           </p>
 
-          {displayAddress && isAddressValid && (
-            <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-              所持数: {balance != null ? balance.toString() : "確認中..."}
-            </p>
-          )}
-
           {isVenueMode ? (
             <div className="mb-4">
               <div className="relative">
@@ -202,14 +196,7 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
                 </button>
               </div>
             </div>
-          ) : (
-            isConnected &&
-            shortAddress && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 font-mono">
-                {shortAddress}
-              </p>
-            )
-          )}
+          ) : null}
 
           <button
             type="button"
