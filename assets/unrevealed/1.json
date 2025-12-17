@@ -1,20 +1,44 @@
 {
-  "name": "Tsukuro SBT - Team B (Unrevealed)",
-  "description": "This is a Soulbound Token (SBT) for Team B participants in the NFT Tsukuro 2025 event. This token will be revealed on January 1, 2026.",
-  "image": "https://github.com/blockchaininnovation/nft-tsukuro-2025/blob/main/docs/public/metadata/unrevealed/B_.png?raw=true",
+  "name": "東大ブロックチェーンコイン UTBLC (Unrevealed)",
+  "description": "このNFTは、日本の伝統的な贈答文化と最先端のブロックチェーン技術の哲学の融合から生まれました。\n\nリビールには「熨斗（のし）」の姿をまとい、価値を静かに内包します。熨斗は、古の人々が鮑（あわび）を押し伸ばし乾かし、贈り物に「心」を添えたことに由来する、日本文化の象徴。チームbのお年玉袋の熨斗には、手仕事の温かさ、相手を思う気持ちが込められています。\n\nこの伝統的な包みには、デジタル価値に物理的な存在感を与える試みを秘めています。左下に配された紅い三角形からは、中に秘められたコインを包むガチャボールが今にも転がり落ちようとしています。\n\n中には金・銀・銅・アルミの4種類のUTBLCコインのいずれかを秘めています。「見えない重み」が作用し、玉結びの水引は本来の位置からわずかにずれ、その歪みは、デジタルデータが物理世界に影響を及ぼす様を視覚的に表現した存在証明です。",
+  "image": "https://blockchaininnovation.github.io/nft-tsukuro-2025/metadata/unrevealed/B_.png",
   "animation_url": "https://blockchaininnovation.github.io/nft-tsukuro-2025/?team=1",
   "attributes": [
     {
+      "trait_type": "AcademicYear",
+      "value": "2025"
+    },
+    {
       "trait_type": "Team",
-      "value": "Team B"
+      "value": "b"
     },
     {
-      "trait_type": "Team ID",
-      "value": "1"
+      "trait_type": "KnotType",
+      "value": "a ball knot"
     },
     {
-      "trait_type": "Status",
-      "value": "Unrevealed"
+      "trait_type": "StrandMaterial",
+      "value": "quad-phase cord composed of Au, Ag, Cu, and Al"
+    },
+    {
+      "trait_type": "StrandType",
+      "value": "Metallic-Treated Silk-Wrapped Cord"
+    },
+    {
+      "trait_type": "NoshiBukuroType",
+      "value": "Otoshidama envelope"
+    },
+    {
+      "trait_type": "NoshiFabric",
+      "value": "Hand-formed (shape)"
+    },
+    {
+      "trait_type": "AccentShape",
+      "value": "Right Triangle"
+    },
+    {
+      "trait_type": "AccentColor",
+      "value": "Vermilion & Coin GachaPon"
     }
   ]
 }

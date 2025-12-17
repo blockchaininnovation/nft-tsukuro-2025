@@ -1,0 +1,53 @@
+{
+  "name": "東大ブロックチェーンコイン UTBLC - 1 UTBLC（決意：パイオニア・キャット） #000176",
+  "description": "UTBLCの哲学的基盤 ——「コードが法となる」\nガチャボールに秘められたUTBLC（UTokyo Blockchain Coin）の思想的基盤は、サトシナカモトが設計したビットコインにあります。サトシは、中央集権的な仲介者への「信頼」を排除し、数学的証明と暗号技術を据えました。Proof-of-Work（PoW）による膨大な計算がデジタル価値を物理的コストに裏打ちされた「困難なビット」として証明します。「コードが法となる」——計算と検証こそが秩序を生むという哲学を学術的に継承し、東京大学ブロックチェーン公開講座から生まれたのがUTBLCです。\n\n4種のコインが描く、ステーブルな調和世界\nUTBLCチェーンでは、物理的な重みと象徴性をもつ4つの独立コインが調和した世界観を形づくります。\n\n1 UTBLC／アルミの猫：「始原」——すべての革新は、一つのトランザクションから始まる\n10 UTBLC／ブロンズの犬：「信頼」——連帯と継続を支える基盤\n100 UTBLC／シルバーの猫：「理性」——自由と秩序を両立させる知性\n1000 UTBLC／ゴールドの犬：「主権」——トラストレスな世界で成立する自律的忠誠\n\n学びの出発点としてのSBT\nこのコレクションは、ブロックチェーンを「学ぶ」だけでなく、NFTを作ることで理解したいという想いから生まれた、コミュニティ共創の成果です。参加者全員で一つのコレクションを完成させ、ミントまで到達する——それは学びの成果を刻む、出発点そのものです。\n\n形式はOpen Edition、チェーンはPolygon。ガス代は東京大学側が全額負担し、参加者は無料でミントできます。さあ、ガチャガチャ感覚でMINTしてみてください。その一枚は、あなたにとってどんな「価値の始まり」になるでしょうか。\n\nシリアル番号がもたらす、保有履歴の完全な透明性\n\nUTBLCの最大の特徴は、発行される全てのコインに固有のシリアル番号が付与される点にあります。このSBT（Soulbound Token）は譲渡不可能であり、発行から保有に至るまでの系譜がブロックチェーン上に恒久的に刻まれます。\n\n現実世界の硬貨は一度流通すると個別の追跡が不可能ですが、UTBLCは最小単位に至るまでシリアル番号によってアイデンティティが管理されます。これにより、そのコインが「いつ、誰に対して、どのような学びの証として発行されたか」という出自の真正性を誰でも確認することが可能です。不正な複製や身元の偽装を許さないこの仕組みは、デジタル空間における純粋な信頼の基盤となります。\n\n4つのコインに刻まれたシリアル番号は、あなたの学びの軌跡を唯一無二の存在として証明します。さあ、あなたの「証」をミントしましょう。",
+  "image": "https://blockchaininnovation.github.io/nft-tsukuro-2025/metadata/revealed/1/Gemini_Generated_Image_6vquky6vquky6vqu.png",
+  "animation_url": "https://blockchaininnovation.github.io/nft-tsukuro-2025/?team=1&variant=0",
+  "attributes": [
+    {
+      "trait_type": "ACADEMIC YEAR",
+      "value": "2025年度"
+    },
+    {
+      "trait_type": "TEAM",
+      "value": "チームB"
+    },
+    {
+      "trait_type": "VALUE",
+      "value": "1 UTBLC (最小額面)"
+    },
+    {
+      "trait_type": "Rarity Tier",
+      "value": "Pioneer Genesis (始原/パイオニア精神)"
+    },
+    {
+      "trait_type": "Material",
+      "value": "Aluminum (アルミニウム)"
+    },
+    {
+      "trait_type": "Pioneer Symbol",
+      "value": "Pioneer Cat (パイオニア・キャット)"
+    },
+    {
+      "trait_type": "Core Philosophy",
+      "value": "The Single Resolve (たった一つの決意)"
+    },
+    {
+      "trait_type": "Primary Focus",
+      "value": "Infinite Possibility (無限の可能性)"
+    },
+    {
+      "trait_type": "Conceptual Role",
+      "value": "First Courage (最初の勇気)"
+    },
+    {
+      "trait_type": "Serial Number",
+      "display_type": "number",
+      "value": 176
+    },
+    {
+      "trait_type": "Variant",
+      "value": 0
+    }
+  ]
+}
