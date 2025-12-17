@@ -149,7 +149,7 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
         onScanSuccess={handleQrScanSuccess}
         onError={handleQrScanError}
       />
-      <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+      <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
         <div className="relative w-full aspect-square bg-gray-100 dark:bg-gray-900">
           <Image
             src={image}
@@ -159,17 +159,11 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           />
         </div>
-        <div className="p-4">
+        <div className="p-4 flex flex-col grow">
           <h3 className="text-lg font-semibold mb-2">{title}</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 grow">
             {description}
           </p>
-
-          {displayAddress && isAddressValid && (
-            <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-              所持数: {balance != null ? balance.toString() : "確認中..."}
-            </p>
-          )}
 
           {isVenueMode ? (
             <div className="mb-4">
@@ -202,14 +196,7 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
                 </button>
               </div>
             </div>
-          ) : (
-            isConnected &&
-            shortAddress && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 font-mono">
-                {shortAddress}
-              </p>
-            )
-          )}
+          ) : null}
 
           <button
             type="button"

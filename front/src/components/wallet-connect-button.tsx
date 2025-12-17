@@ -8,8 +8,13 @@ export function WalletConnectButton() {
   if (isConnected && shortAddress) {
     return (
       <div className="flex items-center gap-3">
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          {shortAddress}
+        <div className="text-right">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            ウォレットアドレス
+          </p>
+          <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">
+            {shortAddress}
+          </p>
         </div>
         <button
           type="button"
