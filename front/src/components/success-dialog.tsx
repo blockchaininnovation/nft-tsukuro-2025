@@ -80,7 +80,7 @@ export function SuccessDialog({ isOpen, onClose, txHash }: SuccessDialogProps) {
               Transaction Hash
             </p>
             <a
-              href={`https://amoy.polygonscan.com/tx/${txHash}`}
+              href={`https://polygonscan.com/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-mono text-blue-600 dark:text-blue-400 hover:underline break-all"
