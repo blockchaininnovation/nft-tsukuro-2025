@@ -2,7 +2,7 @@
   "name": "Departure of the 2025 Alumni (Unrevealed)",
   "description": "This pochi bag was distributed to commemorate the completion of the 2025 UTokyo Blockchain Open Lecture Course. Inside is a coin depicting alumni setting off from Japan into the vast world of Web3, beyond borders and conventional frameworks.\n\nMay the relationships within the cohort who studied together in the same course at the same time continue, allowing them to celebrate one another's future achievements.",
   "image": "https://blockchaininnovation.github.io/nft-tsukuro-2025/metadata/unrevealed/TeamC_before_reveal_Base.png",
-  "animation_url": "https://blockchaininnovation.github.io/nft-tsukuro-2025/?team=2",
+  "animation_url": "https://blockchaininnovation.github.io/nft-tsukuro-2025/?team=2&serial=000000",
   "attributes": [
     {
       "trait_type": "ACADEMIC YEAR",
