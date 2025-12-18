@@ -26,7 +26,6 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
     displayAddress,
     contractAddress,
     isAddressValid,
-    shortAddress,
     manualAddress,
     setManualAddress,
     chain,
@@ -44,7 +43,7 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
     details: "",
   });
 
-  const { data: balance, refetch: refetchBalance } = useReadContract({
+  const { refetch: refetchBalance } = useReadContract({
     address: contractAddress,
     abi: NFT_ABI,
     functionName: "balanceOf",
@@ -87,34 +86,58 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
   };
 
   const handleMint = async () => {
+    console.log("[nft-card] handleMint called for tokenId:", id);
+    console.log("[nft-card] Current state:", {
+      isVenueMode,
+      isConnected,
+      displayAddress,
+      isAddressValid,
+      chainId: chain?.id,
+    });
+
     if (!isVenueMode && (!isConnected || !displayAddress)) {
+      console.log("[nft-card] Error: Wallet not connected");
       alert("ウォレットを接続してください");
       return;
     }
 
     if (isVenueMode && !isAddressValid) {
+      console.log("[nft-card] Error: Invalid address in venue mode");
       alert("有効なアドレスを入力してください");
       return;
     }
 
     // Try sponsored mint first (always true for Venue Mode)
+    console.log("[nft-card] Starting sponsored mint...");
     setIsSponsoredMinting(true);
     setSponsoredError(null);
 
     try {
+      const requestBody = {
+        to: displayAddress,
+        tokenType: id,
+        chainId: chain?.id,
+      };
+      console.log(
+        "[nft-card] Sending request to /api/sponsored-mint:",
+        requestBody,
+      );
+
       const response = await fetch("/api/sponsored-mint", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: displayAddress,
-          tokenType: id,
-          chainId: chain?.id,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
+      console.log("[nft-card] Response from sponsored-mint:", {
+        status: response.status,
+        ok: response.ok,
+        data,
+      });
 
       if (response.ok && data.success) {
+        console.log("[nft-card] Mint successful! txHash:", data.txHash);
         setSuccessTxHash(data.txHash);
         setShowSuccessDialog(true);
         setIsSponsoredMinting(false);
@@ -123,9 +146,11 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
       }
 
       // If sponsored mint fails
+      console.log("[nft-card] Mint failed:", data.error);
       setSponsoredError(data.error || "ミントに失敗しました");
       setIsSponsoredMinting(false);
-    } catch (_err) {
+    } catch (err) {
+      console.error("[nft-card] Mint request error:", err);
       setSponsoredError("ミントに失敗しました");
       setIsSponsoredMinting(false);
     }
