@@ -1,7 +1,7 @@
 // Contract addresses for different networks
 export const CONTRACT_ADDRESSES = {
   polygon: (process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS ||
-    "0x0000000000000000000000000000000000000000") as `0x${string}`,
+    "0xe7ef9d9ed14dE9489FF23240312baadfb7832be4") as `0x${string}`,
   polygonAmoy: (process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS_TESTNET ||
     "0x0000000000000000000000000000000000000000") as `0x${string}`,
   anvil: (process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS ||
