@@ -56,17 +56,36 @@ const getChainConfig = (chainId: number) => {
   }
 };
 
+const getDefaultChainIdFromEnv = (): number => {
+  const useAnvil = process.env.USE_ANVIL !== "false";
+  const useTestnet = process.env.USE_TESTNET === "true";
+
+  if (useAnvil) return foundry.id;
+  return useTestnet ? polygonAmoy.id : polygon.id;
+};
+
+const parseChainId = (value: unknown): number | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return undefined;
+};
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { to, tokenType, chainId } = body;
 
-    if (!to || tokenType === undefined || !chainId) {
+    if (!to || tokenType === undefined) {
       return NextResponse.json(
         { success: false, error: "Missing required parameters" },
         { status: 400 },
       );
     }
+
+    const resolvedChainId = parseChainId(chainId) ?? getDefaultChainIdFromEnv();
 
     const teamId = Number(tokenType);
     if (teamId < 0 || teamId > 3) {
@@ -77,7 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get chain config based on client's chainId
-    const chainConfig = getChainConfig(chainId);
+    const chainConfig = getChainConfig(resolvedChainId);
     if (!chainConfig) {
       return NextResponse.json(
         { success: false, error: "Unsupported network" },
