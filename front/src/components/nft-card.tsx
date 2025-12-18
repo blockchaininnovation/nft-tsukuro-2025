@@ -26,7 +26,6 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
     displayAddress,
     contractAddress,
     isAddressValid,
-    shortAddress,
     manualAddress,
     setManualAddress,
     chain,
@@ -44,7 +43,7 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
     details: "",
   });
 
-  const { data: balance, refetch: refetchBalance } = useReadContract({
+  const { refetch: refetchBalance } = useReadContract({
     address: contractAddress,
     abi: NFT_ABI,
     functionName: "balanceOf",
@@ -119,7 +118,10 @@ export function NFTCard({ id, title, description, image }: NFTCardProps) {
         tokenType: id,
         chainId: chain?.id,
       };
-      console.log("[nft-card] Sending request to /api/sponsored-mint:", requestBody);
+      console.log(
+        "[nft-card] Sending request to /api/sponsored-mint:",
+        requestBody,
+      );
 
       const response = await fetch("/api/sponsored-mint", {
         method: "POST",

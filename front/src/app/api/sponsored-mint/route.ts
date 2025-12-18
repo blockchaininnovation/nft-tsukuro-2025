@@ -97,7 +97,12 @@ export async function POST(request: NextRequest) {
     const resolvedChainId = parseChainId(chainId) ?? getDefaultChainIdFromEnv();
 
     const teamId = Number(tokenType);
-    console.log("[sponsored-mint] Resolved chainId:", resolvedChainId, "teamId:", teamId);
+    console.log(
+      "[sponsored-mint] Resolved chainId:",
+      resolvedChainId,
+      "teamId:",
+      teamId,
+    );
 
     if (teamId < 0 || teamId > 3) {
       console.log("[sponsored-mint] Error: Invalid team ID:", teamId);
@@ -110,7 +115,10 @@ export async function POST(request: NextRequest) {
     // Get chain config based on client's chainId
     const chainConfig = getChainConfig(resolvedChainId);
     if (!chainConfig) {
-      console.log("[sponsored-mint] Error: Unsupported network for chainId:", resolvedChainId);
+      console.log(
+        "[sponsored-mint] Error: Unsupported network for chainId:",
+        resolvedChainId,
+      );
       return NextResponse.json(
         { success: false, error: "Unsupported network" },
         { status: 400 },
@@ -127,9 +135,14 @@ export async function POST(request: NextRequest) {
     let privateKey: string;
     try {
       privateKey = await getSponsorWalletPrivateKey();
-      console.log("[sponsored-mint] Successfully retrieved sponsor wallet private key");
+      console.log(
+        "[sponsored-mint] Successfully retrieved sponsor wallet private key",
+      );
     } catch (error) {
-      console.error("[sponsored-mint] Failed to get sponsor wallet private key:", error);
+      console.error(
+        "[sponsored-mint] Failed to get sponsor wallet private key:",
+        error,
+      );
       return NextResponse.json(
         { success: false, error: "Server configuration error" },
         { status: 500 },
