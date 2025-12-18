@@ -5,8 +5,9 @@ import { injected } from "wagmi/connectors";
 // Network configuration with Anvil as default for local development
 // Switch networks via environment variables or wallet
 // Environment variables for network configuration
-const useAnvil = process.env.USE_ANVIL !== "false";
-const useTestnet = process.env.USE_TESTNET === "true";
+// NEXT_PUBLIC_ prefix is required for client-side access in Next.js
+const useAnvil = process.env.NEXT_PUBLIC_USE_ANVIL !== "false";
+const useTestnet = process.env.NEXT_PUBLIC_USE_TESTNET === "true";
 
 const getChains = () => {
   if (useAnvil) {
